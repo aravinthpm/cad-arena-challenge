@@ -31,6 +31,18 @@
 7. Receives results and feedback
 8. Updates profile with achievements
 
+### Practice Challenge Flow
+1. Browses available challenges by difficulty or category
+2. Selects a challenge to attempt
+3. Reviews instructions, requirements, and materials
+4. Starts the challenge timer
+5. Creates CAD model according to specifications
+6. Uploads submission files (CAD and STL formats)
+7. Answers technical questions related to the challenge
+8. Submits complete solution
+9. Receives immediate feedback and scoring
+10. Reviews areas for improvement
+
 ## Organization User Journey
 
 ### Account Setup
@@ -48,9 +60,31 @@
 5. Reviews and publishes competition
 6. Monitors registration progress
 
-### Talent Discovery
-1. Reviews competition submissions and results
-2. Identifies promising candidates
-3. Views detailed participant profiles
-4. Contacts selected participants
-5. Establishes relationships for recruitment or collaboration
+### Participant Management
+1. Views list of registered participants
+2. Reviews submitted designs
+3. Provides feedback and scores submissions
+4. Selects winners and finalists
+5. Issues certificates to participants
+6. Contacts promising candidates
+
+### Contest Sharing Process
+1. Creates the contest with all required details
+2. Sets visibility (public, invite-only, internal)
+3. For invite-only contests:
+   - Uploads CSV with participant emails
+   - OR manually enters email addresses
+   - Customizes invitation message
+4. Sends invitations with unique access links
+5. Monitors invitation acceptance rates
+6. Sends reminders to invited participants
+
+### Certificate Management
+1. Selects completed competition for certificate issuance
+2. Chooses certificate type (participation, completion, winner)
+3. Selects certificate template
+4. Customizes certificate details
+5. Generates certificates in bulk
+6. Reviews and approves certificates
+7. Distributes certificates via email
+8. Tracks certificate delivery status

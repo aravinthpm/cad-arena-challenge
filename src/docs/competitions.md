@@ -1,62 +1,79 @@
 
-# Competitions
+# CAD Competitions
+
+## About Competitions
+
+Competitions in CAD Arena are time-bound contests hosted by organizations, companies, or educational institutions. These competitions provide opportunities for CAD designers to demonstrate their skills, compete with others, and potentially get recognized by industry professionals.
+
+### Competition Types
+
+- **Open Competitions**: Available to all registered users
+- **Invite-Only Competitions**: Restricted to specifically invited participants
+- **Internal Competitions**: Limited to members of specific organizations
+
+### Competition Structure
+
+1. **Registration Phase**: Users can register for upcoming competitions
+2. **Competition Phase**: Active period where participants can submit solutions
+3. **Evaluation Phase**: Submissions are evaluated based on predefined criteria
+4. **Results Phase**: Winners are announced and certificates are distributed
 
 ## Participating in Competitions
 
-### Finding Competitions
-
-1. Navigate to the Competitions page
-2. Browse active and upcoming competitions
-3. Filter competitions by organization, difficulty, or prizes
-4. View competition details, including rules and timeline
-
 ### Registration Process
 
-1. Select a competition of interest
-2. Review eligibility requirements
-3. Click the "Register" button
-4. Confirm your participation
-5. Receive confirmation email with competition details
+1. Browse the competitions page to view available contests
+2. Click on a competition to see details and requirements
+3. Click the "Register" button before the registration deadline
+4. Receive confirmation and access to competition materials
 
-### During the Competition
+### Submission Process
 
-1. Log in during the competition timeframe
-2. Navigate to your registered competition
-3. View problem statements and requirements
-4. Download any provided reference files
-5. Create your solution using your preferred CAD software
-6. Upload your solution before the deadline
-7. Submissions are automatically evaluated based on competition criteria
+1. Create your CAD solution using your preferred software
+2. Upload your solution in the required format (typically STL, STEP, etc.)
+3. Answer any technical questions associated with the competition
+4. Submit before the competition deadline
+5. Receive confirmation of successful submission
 
-### Results and Certificates
+### Competition Rules
 
-1. Competition results are published after evaluation
-2. View your ranking and performance metrics
-3. Download participation certificates
-4. Winners receive achievement badges on their profile
-5. Selected participants may be contacted by the hosting organization
+- Adhere to all specifications and constraints provided in the competition brief
+- Submit only original work created during the competition period
+- Respect intellectual property rights and do not use pre-existing models
+- Follow file format and size requirements
+- Submit before the deadline (late submissions are typically not accepted)
 
-## Hosting Competitions (Organizations)
+## Hosting Competitions
 
-### Creating a New Competition
+### For Organizations
 
-1. Navigate to the Competition Management page
-2. Click "Create New Competition"
-3. Fill out the competition details:
+Organizations can host competitions to discover talent, promote their brand, or engage with the CAD community.
+
+### Creating a Competition
+
+1. Navigate to the organization dashboard
+2. Click "Create New Contest" button
+3. Fill in competition details:
    - Title and description
    - Start and end dates
-   - Eligibility criteria
-   - Evaluation parameters
-4. Upload problem statements and reference files
-5. Set prizes and certificates
-6. Publish the competition or save as draft
+   - Competition type (open, invite-only, internal)
+   - Specification requirements
+   - Evaluation criteria
+4. Upload reference materials and templates
+5. Review and publish the competition
 
-### Managing Competitions
+### Managing Participants
 
-1. View all your created competitions
-2. Edit competition details before publication
-3. Monitor registration numbers
-4. Send announcements to registered participants
-5. View and download submissions
-6. Evaluate submissions (if manual evaluation is enabled)
-7. Publish results and issue certificates
+1. View registered participants in the organization dashboard
+2. Track submission progress
+3. Communicate with participants through the platform
+4. Evaluate submissions based on criteria
+5. Generate and issue certificates to participants and winners
+
+### Competition Analytics
+
+Organizations have access to detailed analytics about their competitions:
+- Registration rates
+- Submission rates
+- Participant demographics
+- Performance metrics
