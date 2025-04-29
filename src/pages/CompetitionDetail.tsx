@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Footer from "@/components/Footer";
@@ -8,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Trophy, Users, Clock, FileSymlink, Building, Award } from "lucide-react";
-import { Contest, Challenge } from "@/utils/types";
+import { Contest, Challenge, ChallengeLevel } from "@/utils/types";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -28,7 +27,7 @@ const mockContests: Contest[] = [
         title: "Aerodynamic Spoiler Design",
         description: "Design a spoiler that reduces drag while maintaining downforce.",
         instructions: "Create a CAD model of a spoiler for a standard sedan that improves aerodynamics by at least 5%.",
-        level: "INTERMEDIATE",
+        level: ChallengeLevel.INTERMEDIATE, // Fixed: Using enum value instead of string
         points: 200,
         thumbnailUrl: "/placeholder.svg",
         status: "PUBLISHED",
@@ -43,7 +42,7 @@ const mockContests: Contest[] = [
         title: "Lightweight Wheel Design",
         description: "Design a wheel that reduces weight while maintaining structural integrity.",
         instructions: "Create a CAD model of a wheel that is 20% lighter than standard wheels but maintains safety standards.",
-        level: "ADVANCED",
+        level: ChallengeLevel.ADVANCED, // Fixed: Using enum value instead of string
         points: 300,
         thumbnailUrl: "/placeholder.svg",
         status: "PUBLISHED",
@@ -255,9 +254,9 @@ const CompetitionDetail = () => {
                         {challenge.title}
                       </h3>
                       <Badge variant="outline" className={
-                        challenge.level === "BEGINNER" 
+                        challenge.level === ChallengeLevel.BEGINNER 
                           ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-800" 
-                          : challenge.level === "INTERMEDIATE" 
+                          : challenge.level === ChallengeLevel.INTERMEDIATE 
                           ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-800" 
                           : "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900 dark:text-orange-300 dark:border-orange-800"
                       }>

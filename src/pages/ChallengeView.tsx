@@ -127,7 +127,8 @@ const ChallengeView = () => {
       toast({
         title: "Warning",
         description: `You have ${unansweredQuestions.length} unanswered questions.`,
-        variant: "warning"
+        // Fix: Change "warning" to "default" since "warning" is not a valid variant
+        variant: "default"
       });
       return;
     }
