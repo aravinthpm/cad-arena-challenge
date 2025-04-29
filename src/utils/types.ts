@@ -58,7 +58,7 @@ export interface Challenge {
   level: ChallengeLevel;
   points: number;
   thumbnailUrl: string;
-  status: string | ChallengeStatus;
+  status: ChallengeStatus;
   creatorId: string;
   createdAt: Date;
   updatedAt: Date;
