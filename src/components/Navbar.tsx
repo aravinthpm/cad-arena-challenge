@@ -1,12 +1,52 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isLoggedIn] = useState(false); // Will be replaced with real auth state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userType, setUserType] = useState<"student" | "organization" | null>(null);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Check login status from session storage
+    const loggedInStatus = sessionStorage.getItem("isLoggedIn") === "true";
+    const storedUserType = sessionStorage.getItem("userType") as "student" | "organization" | null;
+    
+    setIsLoggedIn(loggedInStatus);
+    setUserType(storedUserType);
+  }, []);
+
+  const handleLogout = () => {
+    // Clear session storage
+    sessionStorage.removeItem("isLoggedIn");
+    sessionStorage.removeItem("userType");
+    
+    // Update state
+    setIsLoggedIn(false);
+    setUserType(null);
+    
+    // Show toast
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out of your account.",
+    });
+    
+    // Navigate to home
+    navigate("/");
+  };
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -47,14 +87,32 @@ const Navbar = () => {
 
           <div className="hidden md:flex items-center space-x-2">
             {isLoggedIn ? (
-              <Link to="/dashboard">
-                <Button variant="ghost" className="rounded-full h-10 w-10 p-0">
-                  <span className="sr-only">Dashboard</span>
-                  <div className="h-8 w-8 rounded-full bg-cadarena-100 text-cadarena-600 flex items-center justify-center">
-                    U
-                  </div>
-                </Button>
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="rounded-full h-10 w-10 p-0">
+                    <span className="sr-only">Open user menu</span>
+                    <div className="h-8 w-8 rounded-full bg-cadarena-100 text-cadarena-600 flex items-center justify-center">
+                      {userType === "student" ? "S" : "O"}
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    {userType === "student" ? "John Smith" : "Acme Inc"}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer w-full">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 dark:text-red-400">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <div className="flex space-x-2">
                 <Link to="/login">
@@ -106,13 +164,24 @@ const Navbar = () => {
                 </Link>
               </div>
             ) : (
-              <Link
-                to="/dashboard"
-                className="block py-2 text-base font-medium text-gray-700 hover:text-cadarena-600 dark:text-gray-200 dark:hover:text-cadarena-400"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  to="/dashboard"
+                  className="block py-2 text-base font-medium text-gray-700 hover:text-cadarena-600 dark:text-gray-200 dark:hover:text-cadarena-400"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left py-2 text-base font-medium text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300"
+                >
+                  Log out
+                </button>
+              </>
             )}
           </div>
         </div>
