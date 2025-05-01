@@ -27,6 +27,11 @@ export interface Organization extends User {
   website?: string;
   logoUrl?: string;
   contestsCreated: number;
+  verified: boolean;
+  memberSince: Date;
+  industry: string;
+  location: string;
+  employees?: string;
 }
 
 export interface Achievement {
@@ -44,11 +49,7 @@ export enum ChallengeLevel {
   EXPERT = "expert"
 }
 
-export enum ChallengeStatus {
-  DRAFT = "draft",
-  PUBLISHED = "published",
-  ARCHIVED = "archived"
-}
+export type ChallengeStatus = "draft" | "published" | "archived";
 
 export interface Challenge {
   id: string;
@@ -64,6 +65,24 @@ export interface Challenge {
   updatedAt: Date;
   submissionCount: number;
   successRate: number;
+  averageCompletionTime?: number;
+  referenceMaterials?: ReferenceMaterial[];
+  quizQuestions?: QuizQuestion[];
+}
+
+export interface ReferenceMaterial {
+  id: string;
+  type: "image" | "document" | "video" | "link";
+  title: string;
+  description?: string;
+  url: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
 }
 
 export interface Contest {
@@ -77,6 +96,8 @@ export interface Contest {
   registeredUsers: number;
   status: "upcoming" | "active" | "completed";
   prizes?: string[];
+  isPublic: boolean;
+  registrationType: "open" | "invitation" | "approval";
 }
 
 export interface Submission {
@@ -87,4 +108,18 @@ export interface Submission {
   status: "correct" | "incorrect" | "pending";
   fileUrl: string;
   score?: number;
+  completionTime: number;
+  quizAnswers?: Record<string, number>;
+  feedback?: string;
+}
+
+export interface Certificate {
+  id: string;
+  userId: string;
+  contestId: string;
+  issuedAt: Date;
+  certificateUrl: string;
+  achievementType: "winner" | "runner-up" | "participation";
+  issuerName: string;
+  contestTitle: string;
 }
