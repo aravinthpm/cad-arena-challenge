@@ -127,3 +127,34 @@ export interface Certificate {
   issuerName: string;
   contestTitle: string;
 }
+
+export interface PracticeModule {
+  id: string;
+  title: string;
+  description: string;
+  organizationId: string;
+  challenges: Challenge[];
+  accessType: "public" | "private" | "organization";
+  accessList?: string[]; // List of user IDs who have access
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TalentPool {
+  id: string;
+  organizationId: string;
+  name: string;
+  description: string;
+  users: Student[];
+  createdAt: Date;
+}
+
+export interface AccessGroup {
+  id: string;
+  organizationId: string;
+  name: string;
+  description: string;
+  members: string[]; // List of user IDs
+  createdAt: Date;
+  updatedAt: Date;
+}
