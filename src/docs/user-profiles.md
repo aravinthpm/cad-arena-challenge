@@ -22,9 +22,11 @@
 
 ### Finding Other Users
 
-- Search by username or full name
-- Browse leaderboards and competition participants
-- Filter by skills or achievements
+- Search for users by username or ID number
+- Browse profiles of other students and organizations
+- View public portfolios and achievements
+- Track leaderboard positions and competition participation
+- Filter searches by skills, location, or achievements
 
 ## Organization Profiles
 
@@ -97,4 +99,3 @@ Organizations can choose from different subscription tiers:
 - **Basic**: Limited number of competitions and participants
 - **Professional**: Expanded competition features and participant limits
 - **Enterprise**: Unlimited competitions, white-label options, and advanced analytics
-

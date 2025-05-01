@@ -14,6 +14,7 @@ import Competitions from "./pages/Competitions";
 import CompetitionDetail from "./pages/CompetitionDetail";
 import Documentation from "./pages/Documentation";
 import NotFound from "./pages/NotFound";
+import UserSearchPage from "./pages/UserSearchPage";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => {
             <Route path="/competitions" element={<Competitions />} />
             <Route path="/competitions/:id" element={<CompetitionDetail />} />
             <Route path="/documentation" element={<Documentation />} />
+            <Route path="/search" element={<UserSearchPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

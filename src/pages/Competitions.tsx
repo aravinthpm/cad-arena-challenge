@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import UserSearch from "@/components/UserSearch";
 
 // Mock data for contests
 const contests: Contest[] = [
@@ -28,7 +29,9 @@ const contests: Contest[] = [
     challenges: [],
     registeredUsers: 156,
     status: "active",
-    prizes: ["$2000 Cash Prize", "Internship Opportunity", "Industry Recognition"]
+    prizes: ["$2000 Cash Prize", "Internship Opportunity", "Industry Recognition"],
+    isPublic: true,
+    registrationType: "open"
   },
   {
     id: "2",
@@ -40,7 +43,9 @@ const contests: Contest[] = [
     challenges: [],
     registeredUsers: 89,
     status: "upcoming",
-    prizes: ["$1500 Cash Prize", "Feature in Design Magazine", "Mentorship Program"]
+    prizes: ["$1500 Cash Prize", "Feature in Design Magazine", "Mentorship Program"],
+    isPublic: true,
+    registrationType: "open"
   },
   {
     id: "3",
@@ -52,7 +57,9 @@ const contests: Contest[] = [
     challenges: [],
     registeredUsers: 212,
     status: "completed",
-    prizes: ["$3000 Cash Prize", "Product Development Support", "Industry Connections"]
+    prizes: ["$3000 Cash Prize", "Product Development Support", "Industry Connections"],
+    isPublic: true,
+    registrationType: "approval"
   },
   {
     id: "4",
@@ -64,7 +71,9 @@ const contests: Contest[] = [
     challenges: [],
     registeredUsers: 78,
     status: "upcoming",
-    prizes: ["$1000 Cash Prize", "Production Opportunity", "Design Showcase"]
+    prizes: ["$1000 Cash Prize", "Production Opportunity", "Design Showcase"],
+    isPublic: false,
+    registrationType: "invitation"
   },
   {
     id: "5",
@@ -76,7 +85,9 @@ const contests: Contest[] = [
     challenges: [],
     registeredUsers: 132,
     status: "upcoming",
-    prizes: ["$5000 Cash Prize", "Industry Internship", "Conference Presentation"]
+    prizes: ["$5000 Cash Prize", "Industry Internship", "Conference Presentation"],
+    isPublic: true,
+    registrationType: "open"
   },
   {
     id: "6",
@@ -88,7 +99,9 @@ const contests: Contest[] = [
     challenges: [],
     registeredUsers: 175,
     status: "completed",
-    prizes: ["$2500 Cash Prize", "Product Prototype Development", "Investor Pitch Opportunity"]
+    prizes: ["$2500 Cash Prize", "Product Prototype Development", "Investor Pitch Opportunity"],
+    isPublic: true,
+    registrationType: "approval"
   }
 ];
 

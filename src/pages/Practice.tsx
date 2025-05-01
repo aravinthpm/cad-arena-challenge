@@ -1,3 +1,4 @@
+
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import ChallengeCard from "@/components/ChallengeCard";
@@ -17,7 +18,7 @@ const challenges: Challenge[] = [
     level: ChallengeLevel.BEGINNER,
     points: 100,
     thumbnailUrl: "/placeholder.svg",
-    status: "published",
+    status: ChallengeStatus.PUBLISHED,
     creatorId: "org1",
     createdAt: new Date("2023-01-15"),
     updatedAt: new Date("2023-01-15"),
@@ -32,7 +33,7 @@ const challenges: Challenge[] = [
     level: ChallengeLevel.INTERMEDIATE,
     points: 200,
     thumbnailUrl: "/placeholder.svg",
-    status: "published",
+    status: ChallengeStatus.PUBLISHED,
     creatorId: "org2",
     createdAt: new Date("2023-02-20"),
     updatedAt: new Date("2023-02-22"),

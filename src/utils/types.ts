@@ -49,7 +49,11 @@ export enum ChallengeLevel {
   EXPERT = "expert"
 }
 
-export type ChallengeStatus = "draft" | "published" | "archived";
+export enum ChallengeStatus {
+  DRAFT = "draft",
+  PUBLISHED = "published",
+  ARCHIVED = "archived"
+}
 
 export interface Challenge {
   id: string;
