@@ -13,7 +13,7 @@ import {
   Search, 
   Award, 
   Users, 
-  Certificate, 
+  ScrollText, 
   PenTool, 
   Briefcase, 
   GraduationCap 

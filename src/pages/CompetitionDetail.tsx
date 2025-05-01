@@ -1,525 +1,299 @@
-
-import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, Trophy, Users, Clock, FileSymlink, Building, Award } from "lucide-react";
-import { Contest, Challenge } from "@/utils/types";
-import { useToast } from "@/components/ui/use-toast";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-
-// Mock data for the contest
-const mockContests: Contest[] = [
-  {
-    id: "1",
-    title: "Automotive Design Challenge",
-    description: "Create innovative automotive parts that improve fuel efficiency. This competition focuses on sustainable design practices and cutting-edge technology in the automotive industry. Participants will work on real-world problems faced by automotive engineers today.",
-    organizationId: "org1",
-    startDate: new Date("2023-06-15"),
-    endDate: new Date("2023-06-30"),
-    challenges: [
-      {
-        id: "101",
-        title: "Aerodynamic Spoiler Design",
-        description: "Design a spoiler that reduces drag while maintaining downforce.",
-        instructions: "Create a CAD model of a spoiler for a standard sedan that improves aerodynamics by at least 5%.",
-        level: "INTERMEDIATE",
-        points: 200,
-        thumbnailUrl: "/placeholder.svg",
-        status: "PUBLISHED",
-        creatorId: "org1",
-        createdAt: new Date("2023-05-20"),
-        updatedAt: new Date("2023-05-20"),
-        submissionCount: 45,
-        successRate: 62
-      },
-      {
-        id: "102",
-        title: "Lightweight Wheel Design",
-        description: "Design a wheel that reduces weight while maintaining structural integrity.",
-        instructions: "Create a CAD model of a wheel that is 20% lighter than standard wheels but maintains safety standards.",
-        level: "ADVANCED",
-        points: 300,
-        thumbnailUrl: "/placeholder.svg",
-        status: "PUBLISHED",
-        creatorId: "org1",
-        createdAt: new Date("2023-05-20"),
-        updatedAt: new Date("2023-05-20"),
-        submissionCount: 28,
-        successRate: 45
-      }
-    ],
-    registeredUsers: 156,
-    status: "active",
-    prizes: ["$2000 Cash Prize", "Internship Opportunity at Tesla Motors", "Feature in Automotive Design Magazine", "Industry Recognition"]
-  },
-  // ... more mock contests would be here
-];
+import { useParams } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { ChallengeLevel, ChallengeStatus } from '@/utils/types';
+import { Calendar, Trophy, Users, Clock, CheckCircle } from 'lucide-react';
 
 const CompetitionDetail = () => {
-  const { id } = useParams();
-  const [contest, setContest] = useState<Contest | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { toast } = useToast();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Simulate API call to get contest details
-    setLoading(true);
-    
-    // Check login status
-    const loggedInStatus = sessionStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(loggedInStatus);
-
-    // Find the contest with the matching ID
-    const foundContest = mockContests.find(c => c.id === id);
-    
-    setTimeout(() => {
-      if (foundContest) {
-        setContest(foundContest);
+  const { id } = useParams<{ id: string }>();
+  
+  // Mock competition data
+  const competition = {
+    id: id || '1',
+    title: 'Automotive Parts Design Challenge',
+    description: 'Design innovative automotive components with focus on sustainability and performance',
+    organizationName: 'Tesla Motors',
+    startDate: new Date('2025-05-15'),
+    endDate: new Date('2025-06-15'),
+    registeredUsers: 48,
+    status: 'active' as 'upcoming' | 'active' | 'completed',
+    prizes: ['$5,000 First Prize', '$2,500 Second Prize', '$1,000 Third Prize', 'Internship Opportunity for Top 5'],
+    isPublic: true,
+    registrationType: 'open' as 'open' | 'invitation' | 'approval',
+    challenges: [
+      {
+        id: '101',
+        title: 'Lightweight Suspension Component',
+        description: 'Design a lightweight suspension component that maintains structural integrity',
+        level: ChallengeLevel.INTERMEDIATE,
+        points: 300,
+        thumbnailUrl: '/placeholder.svg',
+        status: ChallengeStatus.PUBLISHED,
+        submissionCount: 18,
+        successRate: 72,
+      },
+      {
+        id: '102',
+        title: 'Aerodynamic Side Mirror Design',
+        description: 'Design an aerodynamic side mirror that reduces drag',
+        level: ChallengeLevel.ADVANCED,
+        points: 450,
+        thumbnailUrl: '/placeholder.svg',
+        status: ChallengeStatus.PUBLISHED,
+        submissionCount: 12,
+        successRate: 58,
       }
-      setLoading(false);
-    }, 1000);
-  }, [id]);
-
-  const handleRegister = () => {
-    if (!isLoggedIn) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in or sign up to register for this competition.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsRegistered(true);
-    toast({
-      title: "Registration Successful",
-      description: `You have successfully registered for "${contest?.title}"`,
-    });
+    ]
   };
 
-  const getStatusColor = (status: string) => {
-    switch(status) {
-      case 'upcoming':
-        return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-800';
-      case 'active':
-        return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-800';
-      case 'completed':
-        return 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
-      default:
-        return '';
-    }
+  const calculateDaysRemaining = (endDate: Date): number => {
+    const now = new Date();
+    const difference = endDate.getTime() - now.getTime();
+    return Math.ceil(difference / (1000 * 3600 * 24));
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-grow bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-t-cadarena-600 border-gray-200 border-solid rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Loading competition details...</p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!contest) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-grow bg-gray-50 dark:bg-gray-900">
-          <div className="container py-16 text-center">
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
-              Competition Not Found
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mb-8">
-              The competition you're looking for doesn't exist or has been removed.
-            </p>
-            <Link to="/competitions">
-              <Button>Browse Competitions</Button>
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  const daysRemaining = calculateDaysRemaining(competition.endDate);
 
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-grow bg-gray-50 dark:bg-gray-900">
-        <div className="container py-8">
-          {/* Back button */}
-          <div className="mb-6">
-            <Link to="/competitions" className="flex items-center text-cadarena-600 hover:text-cadarena-700 dark:text-cadarena-400 dark:hover:text-cadarena-300">
-              <svg className="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Back to competitions
-            </Link>
-          </div>
-
-          {/* Competition header */}
-          <div className="mb-8">
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-              <Badge variant="outline" className={cn(getStatusColor(contest.status), "capitalize")}>
-                {contest.status}
-              </Badge>
-              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                <Clock className="h-4 w-4 mr-1" />
-                {contest.status === "upcoming" 
-                  ? `Starts in ${Math.ceil((new Date(contest.startDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days` 
-                  : contest.status === "active" 
-                  ? `Ends in ${Math.ceil((new Date(contest.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days` 
-                  : "Completed"}
+      <main className="flex-1 bg-gray-50 dark:bg-gray-900 py-12">
+        <div className="container mx-auto">
+          {/* Competition Header */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{competition.title}</h1>
+                <p className="text-gray-600 dark:text-gray-300 mt-2">Hosted by {competition.organizationName}</p>
+              </div>
+              <div>
+                <Badge className={
+                  competition.status === 'upcoming' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' :
+                  competition.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                  'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                }>
+                  {competition.status.charAt(0).toUpperCase() + competition.status.slice(1)}
+                </Badge>
               </div>
             </div>
             
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              {contest.title}
-            </h1>
-            
-            <div className="flex flex-wrap gap-6 mb-6">
-              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <Calendar className="h-4 w-4 mr-2" />
-                <span>
-                  {format(new Date(contest.startDate), "MMM d, yyyy")} - {format(new Date(contest.endDate), "MMM d, yyyy")}
-                </span>
+            {/* Competition details */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Duration</p>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    {competition.startDate.toLocaleDateString()} - {competition.endDate.toLocaleDateString()}
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <Users className="h-4 w-4 mr-2" />
-                <span>
-                  {contest.registeredUsers} participants
-                </span>
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Participants</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{competition.registeredUsers}</p>
+                </div>
               </div>
-              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <Building className="h-4 w-4 mr-2" />
-                <span>
-                  Organized by <Link to="/organizations/tesla" className="text-cadarena-600 hover:underline">Tesla Motors</Link>
-                </span>
+              <div className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Prizes</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{competition.prizes.length} prizes</p>
+                </div>
               </div>
             </div>
             
-            <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6">
-              {contest.description}
-            </p>
-            
-            {contest.status === "active" && (
-              <div className="flex flex-wrap gap-4">
-                <Button 
-                  size="lg"
-                  onClick={handleRegister}
-                  disabled={isRegistered}
-                >
-                  {isRegistered ? "Registered" : "Register for this Competition"}
-                </Button>
-                <Button variant="outline" size="lg">
-                  <FileSymlink className="mr-2 h-4 w-4" />
-                  Download Brief
-                </Button>
+            {competition.status === 'active' && (
+              <div className="mt-6">
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Competition progress</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{daysRemaining} days left</p>
+                </div>
+                <Progress value={66} className="h-2" />
               </div>
             )}
+            
+            <div className="flex flex-wrap gap-3 mt-6">
+              <Button size="lg">Register Now</Button>
+              <Button variant="outline" size="lg">View Challenges</Button>
+            </div>
           </div>
           
-          {/* Competition content */}
-          <Tabs defaultValue="challenges" className="w-full">
-            <TabsList className="mb-8">
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="bg-white dark:bg-gray-800 p-1 rounded-lg shadow-sm">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="challenges">Challenges</TabsTrigger>
-              <TabsTrigger value="prizes">Prizes & Awards</TabsTrigger>
-              <TabsTrigger value="timeline">Timeline</TabsTrigger>
-              <TabsTrigger value="rules">Rules & Requirements</TabsTrigger>
+              <TabsTrigger value="participants">Participants</TabsTrigger>
+              <TabsTrigger value="prizes">Prizes</TabsTrigger>
+              <TabsTrigger value="rules">Rules</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="challenges" className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Competition Challenges
-              </h2>
+            <TabsContent value="overview" className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Competition Overview</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">{competition.description}</p>
               
-              {contest.challenges.map((challenge) => (
-                <Card key={challenge.id} className="overflow-hidden transition-all hover:shadow-md">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                        {challenge.title}
-                      </h3>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">About This Competition</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                This competition challenges designers to create innovative automotive components that combine sustainability with high performance. Participants will tackle real-world design problems facing the automotive industry today.
+              </p>
+              
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Key Dates</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <Clock className="h-5 w-5 text-blue-600 dark:text-blue-300" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">Registration Opens</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">May 1, 2025</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-300" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">Competition Begins</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">May 15, 2025</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                    <Clock className="h-5 w-5 text-red-600 dark:text-red-300" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">Submission Deadline</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">June 15, 2025</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                    <Trophy className="h-5 w-5 text-green-600 dark:text-green-300" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">Winners Announced</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">June 30, 2025</p>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="challenges" className="space-y-6">
+              {competition.challenges.map(challenge => (
+                <Card key={challenge.id}>
+                  <CardHeader>
+                    <CardTitle>{challenge.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">{challenge.description}</p>
+                    <div className="flex flex-wrap gap-2 mb-4">
                       <Badge variant="outline" className={
-                        challenge.level === "BEGINNER" 
-                          ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-800" 
-                          : challenge.level === "INTERMEDIATE" 
-                          ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-800" 
-                          : "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900 dark:text-orange-300 dark:border-orange-800"
+                        challenge.level === ChallengeLevel.BEGINNER ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-800" :
+                        challenge.level === ChallengeLevel.INTERMEDIATE ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-800" :
+                        "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900 dark:text-orange-300 dark:border-orange-800"
                       }>
-                        {challenge.level.charAt(0) + challenge.level.slice(1).toLowerCase()}
+                        {challenge.level}
+                      </Badge>
+                      <Badge variant="outline" className="bg-cadarena-50 text-cadarena-700 border-cadarena-200 dark:bg-cadarena-900 dark:text-cadarena-300 dark:border-cadarena-800">
+                        {challenge.points} pts
                       </Badge>
                     </div>
-                    
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
-                      {challenge.description}
-                    </p>
-                    
-                    <div className="flex flex-wrap items-center justify-between gap-4">
-                      <div className="flex items-center space-x-4">
-                        <span className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                          <Award className="h-4 w-4 mr-1" />
-                          {challenge.points} points
-                        </span>
-                        <span className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                          <Users className="h-4 w-4 mr-1" />
-                          {challenge.submissionCount} submissions
-                        </span>
-                      </div>
-                      
-                      <Button variant={isRegistered ? "default" : "outline"} disabled={!isRegistered && contest.status === "active"}>
-                        {isRegistered ? "Start Challenge" : "Register to Participate"}
-                      </Button>
+                    <div className="flex justify-between items-center text-sm mb-2">
+                      <span className="text-gray-600 dark:text-gray-400">Submissions</span>
+                      <span className="font-medium">{challenge.submissionCount}</span>
                     </div>
+                    <div className="flex justify-between items-center text-sm mb-4">
+                      <span className="text-gray-600 dark:text-gray-400">Success Rate</span>
+                      <span className="font-medium">{challenge.successRate}%</span>
+                    </div>
+                    <Button className="w-full">Begin Challenge</Button>
                   </CardContent>
                 </Card>
               ))}
             </TabsContent>
             
-            <TabsContent value="prizes">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                Prizes & Awards
-              </h2>
-              
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-                    <Trophy className="h-5 w-5 mr-2 text-yellow-500" />
-                    Main Prizes
-                  </h3>
-                  
-                  <ul className="space-y-4">
-                    {contest.prizes?.map((prize, index) => (
-                      <li key={index} className="flex items-start">
-                        <div className="flex-shrink-0 h-6 w-6 rounded-full bg-cadarena-100 dark:bg-cadarena-900 text-cadarena-600 dark:text-cadarena-300 flex items-center justify-center mr-3 mt-0.5">
-                          {index + 1}
-                        </div>
-                        <span className="text-gray-700 dark:text-gray-300">{prize}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-                    <Award className="h-5 w-5 mr-2 text-cadarena-500" />
-                    Additional Benefits
-                  </h3>
-                  
-                  <ul className="space-y-4">
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <span className="text-gray-700 dark:text-gray-300">Certificate of participation for all contestants</span>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <span className="text-gray-700 dark:text-gray-300">Digital badges for your CAD Arena profile</span>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <span className="text-gray-700 dark:text-gray-300">Portfolio showcase for top submissions</span>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <span className="text-gray-700 dark:text-gray-300">Networking opportunities with industry professionals</span>
-                    </li>
-                  </ul>
-                </div>
+            <TabsContent value="participants" className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Registered Participants</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                {competition.registeredUsers} designers have registered for this competition.
+              </p>
+              {/* Participant list would go here */}
+            </TabsContent>
+            
+            <TabsContent value="prizes" className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Prizes & Recognition</h2>
+              <div className="space-y-6">
+                {competition.prizes.map((prize, index) => (
+                  <div key={index} className="flex items-center gap-4">
+                    <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                      index === 0 ? 'bg-yellow-100 dark:bg-yellow-900' :
+                      index === 1 ? 'bg-gray-200 dark:bg-gray-700' :
+                      index === 2 ? 'bg-amber-100 dark:bg-amber-900' :
+                      'bg-blue-100 dark:bg-blue-900'
+                    }`}>
+                      <Trophy className={`h-6 w-6 ${
+                        index === 0 ? 'text-yellow-600 dark:text-yellow-400' :
+                        index === 1 ? 'text-gray-600 dark:text-gray-400' :
+                        index === 2 ? 'text-amber-600 dark:text-amber-400' :
+                        'text-blue-600 dark:text-blue-400'
+                      }`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                        {index === 0 ? 'First Place' :
+                         index === 1 ? 'Second Place' :
+                         index === 2 ? 'Third Place' :
+                         `Additional Prize ${index - 2}`}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300">{prize}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </TabsContent>
             
-            <TabsContent value="timeline">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                Competition Timeline
-              </h2>
-              
-              <div className="relative border-l-2 border-gray-300 dark:border-gray-700 pl-8 ml-4 space-y-10">
-                <div className="relative">
-                  <div className="absolute -left-10 mt-1 h-5 w-5 rounded-full bg-cadarena-500"></div>
-                  <div className="text-sm text-cadarena-600 dark:text-cadarena-400 mb-1">
-                    {format(new Date(contest.startDate), "MMMM d, yyyy")}
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                    Competition Start
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Registration opens, challenge details are published
-                  </p>
-                </div>
-                
-                <div className="relative">
-                  <div className="absolute -left-10 mt-1 h-5 w-5 rounded-full bg-gray-300 dark:bg-gray-700"></div>
-                  <div className="text-sm text-cadarena-600 dark:text-cadarena-400 mb-1">
-                    {format(new Date(new Date(contest.startDate).getTime() + (new Date(contest.endDate).getTime() - new Date(contest.startDate).getTime()) / 2), "MMMM d, yyyy")}
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                    Midway Progress Check
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Optional progress submission for feedback
-                  </p>
-                </div>
-                
-                <div className="relative">
-                  <div className="absolute -left-10 mt-1 h-5 w-5 rounded-full bg-gray-300 dark:bg-gray-700"></div>
-                  <div className="text-sm text-cadarena-600 dark:text-cadarena-400 mb-1">
-                    {format(new Date(contest.endDate), "MMMM d, yyyy")}
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                    Final Submission Deadline
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    All entries must be submitted by 11:59 PM
-                  </p>
-                </div>
-                
-                <div className="relative">
-                  <div className="absolute -left-10 mt-1 h-5 w-5 rounded-full bg-gray-300 dark:bg-gray-700"></div>
-                  <div className="text-sm text-cadarena-600 dark:text-cadarena-400 mb-1">
-                    {format(new Date(new Date(contest.endDate).getTime() + 7 * 24 * 60 * 60 * 1000), "MMMM d, yyyy")}
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                    Results Announcement
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Winners and top participants will be announced
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="rules">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                Rules & Requirements
-              </h2>
-              
-              <div className="grid md:grid-cols-2 gap-8">
+            <TabsContent value="rules" className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Competition Rules</h2>
+              <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                    Submission Guidelines
-                  </h3>
-                  
-                  <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      All submissions must be in STL format
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      Maximum file size: 50MB per submission
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      Include a brief description (max 500 words)
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      Optional: Add screenshots and renders
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      Submissions must include parametric data
-                    </li>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Eligibility</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    This competition is open to all registered users of CAD Arena with active accounts.
+                  </p>
+                </div>
+                <Separator />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Submission Requirements</h3>
+                  <ul className="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-300">
+                    <li>All designs must be original and created by the submitting participant</li>
+                    <li>Submissions must include both CAD files and STL exports</li>
+                    <li>Designs must meet all specified dimensional and functional requirements</li>
+                    <li>Each participant may submit up to 3 different design approaches</li>
                   </ul>
                 </div>
-                
+                <Separator />
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                    Eligibility & Terms
-                  </h3>
-                  
-                  <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      Open to students and professionals worldwide
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      No entry fee required
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      Submissions must be original work
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      Rights to designs remain with creators
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 text-cadarena-600 dark:text-cadarena-400 mr-3 mt-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      Tesla Motors may contact finalists for recruitment
-                    </li>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Judging Criteria</h3>
+                  <ul className="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-300">
+                    <li>Innovation and creativity (30%)</li>
+                    <li>Functionality and practicality (25%)</li>
+                    <li>Technical execution and complexity (25%)</li>
+                    <li>Sustainability considerations (20%)</li>
                   </ul>
+                </div>
+                <Separator />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Intellectual Property</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Participants retain ownership of their submissions, but grant Tesla Motors a non-exclusive license to review and potentially utilize winning designs with appropriate compensation to be negotiated separately.
+                  </p>
                 </div>
               </div>
             </TabsContent>
