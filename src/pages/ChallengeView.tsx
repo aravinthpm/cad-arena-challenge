@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
-import { Challenge, ChallengeLevel } from "@/utils/types";
+import { Challenge, ChallengeLevel, ChallengeStatus } from "@/utils/types";
 import { Clock } from "lucide-react";
 
 // Mock data for a single challenge
@@ -27,7 +27,7 @@ const challengeData: Challenge = {
   level: ChallengeLevel.BEGINNER,
   points: 100,
   thumbnailUrl: "/placeholder.svg",
-  status: "published",
+  status: ChallengeStatus.PUBLISHED,
   creatorId: "org1",
   createdAt: new Date("2023-01-15"),
   updatedAt: new Date("2023-01-15"),
