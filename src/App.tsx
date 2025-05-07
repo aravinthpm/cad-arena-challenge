@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import UserSearchPage from "./pages/UserSearchPage";
 import CreateChallengePage from "./pages/CreateChallengePage";
 import UserProfilePage from "./pages/UserProfilePage";
+import LeaderboardPage from "./pages/Leaderboard";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => {
             <Route path="/competitions/:id" element={<CompetitionDetail />} />
             <Route path="/documentation" element={<Documentation />} />
             <Route path="/search" element={<UserSearchPage />} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/create-challenge" element={<CreateChallengePage />} />
             <Route path="/profile/:id" element={<UserProfilePage />} />
             <Route path="/profile/:id/followers" element={<UserProfilePage />} />
