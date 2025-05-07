@@ -1,85 +1,107 @@
 
-import { Button } from "@/components/ui/button";
-import ChallengeCard from "./ChallengeCard";
-import { Challenge, ChallengeLevel, ChallengeStatus } from "@/utils/types";
 import { Link } from "react-router-dom";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Clock, Users, Trophy } from "lucide-react";
 
-// Mock data for featured challenges
-const featuredChallenges: Challenge[] = [
-  {
-    id: "1",
-    title: "Basic Gear Design",
-    description: "Create a simple spur gear with specific tooth profile and dimensions.",
-    instructions: "Design a spur gear with 24 teeth, module 2mm, and pressure angle of 20°.",
-    level: ChallengeLevel.BEGINNER,
-    points: 100,
-    thumbnailUrl: "/placeholder.svg",
-    status: ChallengeStatus.PUBLISHED,
-    creatorId: "org1",
-    createdAt: new Date("2023-01-15"),
-    updatedAt: new Date("2023-01-15"),
-    submissionCount: 876,
-    successRate: 87,
-  },
-  {
-    id: "2",
-    title: "Ergonomic Handle",
-    description: "Design an ergonomic handle for a kitchen utensil that fits comfortably in the hand.",
-    instructions: "Create a handle that fits the human grip with appropriate curves and dimensions.",
-    level: ChallengeLevel.INTERMEDIATE,
-    points: 200,
-    thumbnailUrl: "/placeholder.svg",
-    status: ChallengeStatus.PUBLISHED,
-    creatorId: "org2",
-    createdAt: new Date("2023-02-20"),
-    updatedAt: new Date("2023-02-22"),
-    submissionCount: 542,
-    successRate: 65,
-  },
-  {
-    id: "3",
-    title: "Parametric Bracket Design",
-    description: "Create a fully parameterized corner bracket that can adapt to different load requirements.",
-    instructions: "Design a bracket that can be adjusted through parameters for different applications.",
-    level: ChallengeLevel.ADVANCED,
-    points: 300,
-    thumbnailUrl: "/placeholder.svg",
-    status: ChallengeStatus.PUBLISHED,
-    creatorId: "org1",
-    createdAt: new Date("2023-03-10"),
-    updatedAt: new Date("2023-03-15"),
-    submissionCount: 315,
-    successRate: 42,
-  },
-];
+interface FeaturedChallengesProps {
+  maxItems?: number;
+}
 
-const FeaturedChallenges = () => {
+const FeaturedChallenges = ({ maxItems = 3 }: FeaturedChallengesProps) => {
+  // Mock challenges data
+  const challenges = [
+    {
+      id: "c1",
+      title: "Parametric Furniture Design",
+      difficulty: "Advanced",
+      participants: 145,
+      deadline: "2 days",
+      prize: "$1,500",
+      isCompetition: false,
+    },
+    {
+      id: "c2",
+      title: "Mechanical Assembly Challenge",
+      difficulty: "Intermediate",
+      participants: 89,
+      deadline: "4 days",
+      prize: "$500",
+      isCompetition: true,
+    },
+    {
+      id: "c3",
+      title: "3D Architectural Visualization",
+      difficulty: "Beginner",
+      participants: 210,
+      deadline: "5 days",
+      prize: "$750",
+      isCompetition: false,
+    },
+    {
+      id: "c4",
+      title: "Medical Device Prototyping",
+      difficulty: "Expert",
+      participants: 62,
+      deadline: "7 days",
+      prize: "$2,000",
+      isCompetition: true,
+    },
+  ];
+
+  // Limit the number of challenges to display
+  const displayedChallenges = challenges.slice(0, maxItems);
+
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-gray-50 dark:bg-gray-900">
-      <div className="container">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Featured Challenges
-            </h2>
-            <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
-              Test your CAD skills with our most popular design challenges
-            </p>
-          </div>
-          <Link to="/practice">
-            <Button variant="outline" className="mt-4 md:mt-0">
-              View All Challenges
-            </Button>
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredChallenges.map((challenge) => (
-            <ChallengeCard key={challenge.id} challenge={challenge} featured={true} />
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Featured Challenges</CardTitle>
+        <Link to="/practice">
+          <Button variant="outline" size="sm">View All</Button>
+        </Link>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {displayedChallenges.map((challenge) => (
+            <div 
+              key={challenge.id}
+              className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
+            >
+              <div className="mb-3 sm:mb-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-medium">{challenge.title}</h3>
+                  {challenge.isCompetition && (
+                    <Badge variant="secondary" className="ml-2">
+                      <Trophy className="h-3 w-3 mr-1" />
+                      Competition
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                  <span className="flex items-center">
+                    <Users className="h-3.5 w-3.5 mr-1" />
+                    {challenge.participants} participants
+                  </span>
+                  <span className="flex items-center">
+                    <Clock className="h-3.5 w-3.5 mr-1" />
+                    {challenge.deadline} remaining
+                  </span>
+                </div>
+              </div>
+              <Link to={`/challenge/${challenge.id}`}>
+                <Button size="sm">View Challenge</Button>
+              </Link>
+            </div>
           ))}
         </div>
-      </div>
-    </section>
+      </CardContent>
+      <CardFooter className="flex justify-center border-t pt-4">
+        <Link to="/practice">
+          <Button variant="outline">Explore All Challenges</Button>
+        </Link>
+      </CardFooter>
+    </Card>
   );
 };
 
