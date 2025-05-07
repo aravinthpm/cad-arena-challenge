@@ -127,3 +127,10 @@ export interface Certificate {
   issuerName: string;
   contestTitle: string;
 }
+
+// New types for follow system
+export interface UserFollowRelation {
+  followerId: string;
+  followingId: string;
+  createdAt: Date;
+}

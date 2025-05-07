@@ -2,12 +2,13 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Student, Organization, UserRole } from "@/utils/types";
 import { Link } from "react-router-dom";
-import { Search, Users } from "lucide-react";
+import { Search, Users, UserPlus, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "@/hooks/use-toast";
 
 // Mock data for users
 const mockUsers: (Student | Organization)[] = [
@@ -38,6 +39,32 @@ const mockUsers: (Student | Organization)[] = [
     achievements: []
   },
   {
+    id: "s3",
+    username: "mike_3d",
+    email: "mike@example.com",
+    role: UserRole.STUDENT,
+    avatarUrl: "/placeholder.svg",
+    createdAt: new Date("2023-03-20"),
+    streak: 45,
+    points: 3700,
+    completedChallenges: 55,
+    level: 5,
+    achievements: []
+  },
+  {
+    id: "s4",
+    username: "alex_designer",
+    email: "alex@example.com",
+    role: UserRole.STUDENT,
+    avatarUrl: "/placeholder.svg",
+    createdAt: new Date("2023-04-05"),
+    streak: 12,
+    points: 1800,
+    completedChallenges: 28,
+    level: 3,
+    achievements: []
+  },
+  {
     id: "org1",
     username: "acme_engineering",
     email: "contact@acme.com",
@@ -54,17 +81,60 @@ const mockUsers: (Student | Organization)[] = [
     industry: "Manufacturing",
     location: "Boston, MA",
     employees: "100-500"
+  },
+  {
+    id: "org2",
+    username: "tech_innovators",
+    email: "info@techinnovators.com",
+    role: UserRole.ORGANIZATION,
+    avatarUrl: "/placeholder.svg",
+    createdAt: new Date("2022-10-15"),
+    name: "Tech Innovators",
+    description: "Breaking boundaries with technology",
+    website: "https://techinnovators.example.com",
+    logoUrl: "/placeholder.svg",
+    contestsCreated: 8,
+    verified: true,
+    memberSince: new Date("2022-10-15"),
+    industry: "Technology",
+    location: "San Francisco, CA",
+    employees: "50-100"
   }
+];
+
+// Mock data for followers/following
+const mockFollowRelations = [
+  { followerId: "s1", followingId: "s2" },
+  { followerId: "s1", followingId: "s3" },
+  { followerId: "s2", followingId: "s1" },
+  { followerId: "s3", followingId: "s1" },
+  { followerId: "s4", followingId: "s1" },
+  { followerId: "s2", followingId: "s4" },
+  { followerId: "s1", followingId: "org1" },
+  { followerId: "s2", followingId: "org1" },
+  { followerId: "s3", followingId: "org2" }
 ];
 
 interface UserSearchProps {
   className?: string;
+  mode?: "search" | "followers" | "following";
+  userId?: string;
 }
 
-const UserSearch = ({ className }: UserSearchProps) => {
+const UserSearch = ({ className, mode = "search", userId }: UserSearchProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<(Student | Organization)[]>([]);
   const [searchPerformed, setSearchPerformed] = useState(false);
+  const [followingStatus, setFollowingStatus] = useState<Record<string, boolean>>({});
+
+  // Initialize the component based on mode
+  useState(() => {
+    if (mode === "followers" && userId) {
+      showFollowers(userId);
+    } else if (mode === "following" && userId) {
+      showFollowing(userId);
+    }
+  });
 
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
@@ -77,6 +147,68 @@ const UserSearch = ({ className }: UserSearchProps) => {
     );
     
     setSearchResults(results);
+    initializeFollowingStatus(results);
+  };
+
+  const showFollowers = (userId: string) => {
+    const followerIds = mockFollowRelations
+      .filter(relation => relation.followingId === userId)
+      .map(relation => relation.followerId);
+    
+    const followers = mockUsers.filter(user => followerIds.includes(user.id));
+    
+    setSearchResults(followers);
+    setSearchPerformed(true);
+    initializeFollowingStatus(followers);
+  };
+
+  const showFollowing = (userId: string) => {
+    const followingIds = mockFollowRelations
+      .filter(relation => relation.followerId === userId)
+      .map(relation => relation.followingId);
+    
+    const following = mockUsers.filter(user => followingIds.includes(user.id));
+    
+    setSearchResults(following);
+    setSearchPerformed(true);
+    initializeFollowingStatus(following);
+  };
+
+  const initializeFollowingStatus = (users: (Student | Organization)[]) => {
+    // Assuming current user is s1
+    const currentUserId = "s1";
+    
+    const statusMap: Record<string, boolean> = {};
+    users.forEach(user => {
+      // Check if current user follows this user
+      const isFollowing = mockFollowRelations.some(
+        relation => relation.followerId === currentUserId && relation.followingId === user.id
+      );
+      statusMap[user.id] = isFollowing;
+    });
+    
+    setFollowingStatus(statusMap);
+  };
+
+  const toggleFollow = (userId: string) => {
+    setFollowingStatus(prev => {
+      const newStatus = !prev[userId];
+      
+      // In a real app, this would make an API call to follow/unfollow
+      if (newStatus) {
+        toast({
+          title: "Success",
+          description: "You are now following this user",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "You have unfollowed this user",
+        });
+      }
+      
+      return { ...prev, [userId]: newStatus };
+    });
   };
 
   const getInitials = (user: Student | Organization) => {
@@ -87,52 +219,79 @@ const UserSearch = ({ className }: UserSearchProps) => {
     }
   };
 
+  const getTitle = () => {
+    switch (mode) {
+      case "followers":
+        return "Followers";
+      case "following":
+        return "Following";
+      default:
+        return "Find Users";
+    }
+  };
+
+  const getDescription = () => {
+    switch (mode) {
+      case "followers":
+        return "People who follow you";
+      case "following":
+        return "People you follow";
+      default:
+        return "Search for students or organizations by username or ID";
+    }
+  };
+
   return (
     <div className={className}>
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-semibold mb-4">Find Users</h2>
+        <h2 className="text-2xl font-semibold mb-4">{getTitle()}</h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
-          Search for students or organizations by username or ID
+          {getDescription()}
         </p>
 
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Enter username or ID..."
-              className="w-full"
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            />
+        {mode === "search" && (
+          <div className="flex gap-2 mb-8">
+            <div className="flex-1">
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Enter username or ID..."
+                className="w-full"
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              />
+            </div>
+            <Button onClick={handleSearch}>
+              <Search className="h-4 w-4 mr-2" />
+              Search
+            </Button>
           </div>
-          <Button onClick={handleSearch}>
-            <Search className="h-4 w-4 mr-2" />
-            Search
-          </Button>
-        </div>
+        )}
 
-        <div className="mt-8">
+        <div>
           {searchPerformed && (
             <>
               <div className="flex items-center mb-4">
                 <Users className="mr-2 h-5 w-5" />
                 <h3 className="text-lg font-medium">
-                  {searchResults.length} user{searchResults.length !== 1 ? 's' : ''} found
+                  {searchResults.length} user{searchResults.length !== 1 ? 's' : ''}
+                  {mode === "followers" ? " follow you" : mode === "following" ? " you follow" : " found"}
                 </h3>
               </div>
 
               {searchResults.length > 0 ? (
                 <div className="space-y-4">
                   {searchResults.map(user => (
-                    <Link to={`/profile/${user.id}`} key={user.id}>
-                      <Card className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-4">
+                    <Card key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-4">
+                          <Link to={`/profile/${user.id}`} className="flex-shrink-0">
                             <Avatar className="h-12 w-12">
                               <AvatarImage src={user.avatarUrl || "/placeholder.svg"} alt={user.username} />
                               <AvatarFallback>{getInitials(user)}</AvatarFallback>
                             </Avatar>
-                            <div className="flex-1">
+                          </Link>
+                          <div className="flex-1">
+                            <Link to={`/profile/${user.id}`}>
                               <div className="flex items-center gap-2">
                                 <h4 className="font-medium">
                                   {user.role === UserRole.ORGANIZATION 
@@ -151,17 +310,41 @@ const UserSearch = ({ className }: UserSearchProps) => {
                                   ? `Level ${(user as Student).level} • ${(user as Student).points} points` 
                                   : `${(user as Organization).industry} • ${(user as Organization).location}`}
                               </p>
-                            </div>
+                            </Link>
                           </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
+                          {user.id !== "s1" && ( // Don't show follow button for self (assuming s1 is current user)
+                            <Button 
+                              variant={followingStatus[user.id] ? "outline" : "default"}
+                              size="sm"
+                              onClick={() => toggleFollow(user.id)}
+                              className="flex-shrink-0"
+                            >
+                              {followingStatus[user.id] ? (
+                                <>
+                                  <Check className="h-4 w-4 mr-2" />
+                                  Following
+                                </>
+                              ) : (
+                                <>
+                                  <UserPlus className="h-4 w-4 mr-2" />
+                                  Follow
+                                </>
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-12 border-dashed border-2 border-gray-200 dark:border-gray-700 rounded-lg">
                   <p className="text-gray-500 dark:text-gray-400 mb-2">No users found</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">Try a different username or ID</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">
+                    {mode === "search" ? "Try a different username or ID" : 
+                     mode === "followers" ? "You don't have any followers yet" : 
+                     "You aren't following anyone yet"}
+                  </p>
                 </div>
               )}
             </>
