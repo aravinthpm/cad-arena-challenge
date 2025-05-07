@@ -106,22 +106,22 @@ const UserProfilePage = () => {
         setUser(foundUser);
         
         // Check if current user is following this user
-        const following = mockFollowRelations.some(
+        const isUserFollowing = mockFollowRelations.some(
           relation => relation.followerId === currentUserId && relation.followingId === foundUser.id
         );
-        setIsFollowing(following);
+        setIsFollowing(isUserFollowing);
         
         // Count followers and following
         const followers = mockFollowRelations.filter(
           relation => relation.followingId === foundUser.id
         ).length;
         
-        const following = mockFollowRelations.filter(
+        const followingUsers = mockFollowRelations.filter(
           relation => relation.followerId === foundUser.id
         ).length;
         
         setFollowerCount(followers);
-        setFollowingCount(following);
+        setFollowingCount(followingUsers);
       }
       
       setLoading(false);

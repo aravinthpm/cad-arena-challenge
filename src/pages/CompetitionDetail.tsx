@@ -55,7 +55,9 @@ const mockContests: Contest[] = [
     ],
     registeredUsers: 156,
     status: "active",
-    prizes: ["$2000 Cash Prize", "Internship Opportunity at Tesla Motors", "Feature in Automotive Design Magazine", "Industry Recognition"]
+    prizes: ["$2000 Cash Prize", "Internship Opportunity at Tesla Motors", "Feature in Automotive Design Magazine", "Industry Recognition"],
+    isPublic: true,
+    registrationType: "open" as const,
   },
   // ... more mock contests would be here
 ];
