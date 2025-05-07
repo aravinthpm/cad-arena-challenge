@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -128,13 +128,13 @@ const UserSearch = ({ className, mode = "search", userId }: UserSearchProps) => 
   const [followingStatus, setFollowingStatus] = useState<Record<string, boolean>>({});
 
   // Initialize the component based on mode
-  useState(() => {
+  useEffect(() => {
     if (mode === "followers" && userId) {
       showFollowers(userId);
     } else if (mode === "following" && userId) {
       showFollowing(userId);
     }
-  });
+  }, [mode, userId]);
 
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
