@@ -17,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
 import { Challenge, ChallengeLevel, ChallengeStatus } from "@/utils/types";
 import { Clock } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 // Mock data for a single challenge
 const challengeData: Challenge = {
@@ -79,7 +80,8 @@ const ChallengeView = () => {
   
   // State for timer
   const [timeElapsed, setTimeElapsed] = useState(0);
-  const [timerActive, setTimerActive] = useState(true);
+  const [timerActive, setTimerActive] = useState(false); // Changed to false initially
+  const [challengeStarted, setChallengeStarted] = useState(false);
   
   // State for file uploads
   const [cadFile, setCadFile] = useState<File | null>(null);
@@ -95,11 +97,11 @@ const ChallengeView = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
   
-  // Start timer when component mounts
+  // Start timer only when challengeStarted is true
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     
-    if (timerActive) {
+    if (timerActive && challengeStarted) {
       interval = setInterval(() => {
         setTimeElapsed(prev => prev + 1);
       }, 1000);
@@ -108,7 +110,13 @@ const ChallengeView = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timerActive]);
+  }, [timerActive, challengeStarted]);
+
+  // Start the challenge and timer
+  const startChallenge = () => {
+    setChallengeStarted(true);
+    setTimerActive(true);
+  };
   
   const handleCadFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -186,6 +194,80 @@ const ChallengeView = () => {
     navigate("/practice");
   };
   
+  // Welcome screen if challenge hasn't started
+  if (!challengeStarted) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+          <div className="container max-w-4xl py-8">
+            <Card className="overflow-hidden">
+              <div className="aspect-video bg-gray-100 dark:bg-gray-700 relative">
+                <img 
+                  src={challengeData.thumbnailUrl} 
+                  alt={challengeData.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader>
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline" className={
+                    challengeData.level === ChallengeLevel.BEGINNER ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-800" :
+                    challengeData.level === ChallengeLevel.INTERMEDIATE ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-800" :
+                    challengeData.level === ChallengeLevel.ADVANCED ? "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900 dark:text-orange-300 dark:border-orange-800" :
+                    "bg-red-50 text-red-700 border-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-800"
+                  }>
+                    {challengeData.level}
+                  </Badge>
+                  <Badge variant="outline">
+                    {challengeData.points} points
+                  </Badge>
+                </div>
+                <CardTitle className="text-2xl">{challengeData.title}</CardTitle>
+                <CardDescription className="text-base">{challengeData.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Instructions</h3>
+                    <p className="text-gray-600 dark:text-gray-400">{challengeData.instructions}</p>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                    <h3 className="font-semibold mb-2">What to expect:</h3>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Timer will start as soon as you begin the challenge</li>
+                      <li>You'll need to upload both a CAD file and STL file</li>
+                      <li>Complete all knowledge check questions</li>
+                      <li>You can give up at any time, but your progress won't be saved</li>
+                    </ul>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Challenge Stats</p>
+                      <div className="flex gap-4 text-sm text-gray-500">
+                        <span>Submissions: {challengeData.submissionCount}</span>
+                        <span>Success rate: {challengeData.successRate}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-between border-t pt-6">
+                <Button variant="outline" onClick={() => navigate("/practice")}>
+                  Back to Challenges
+                </Button>
+                <Button onClick={startChallenge}>
+                  Begin Challenge
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -213,12 +295,50 @@ const ChallengeView = () => {
               </div>
             </div>
             <div className="mt-4 md:mt-0 flex gap-2">
-              <Button variant="outline" onClick={handleGiveUp}>
-                Give Up
-              </Button>
-              <Button onClick={handleSubmit}>
-                Submit Challenge
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline">Give Up</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      If you give up now, your progress will not be saved. You can try this challenge again later.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleGiveUp} className="bg-red-600 hover:bg-red-700">
+                      Yes, Give Up
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button>Submit Challenge</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Submit your solution?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {(!cadFile || !stlFile || Object.keys(answers).length < quizQuestions.length) ? 
+                        "Your solution is incomplete. Please make sure you've uploaded all required files and answered all questions." :
+                        "Your solution will be submitted for evaluation. Are you ready to submit?"}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleSubmit}
+                      disabled={!cadFile || !stlFile || Object.keys(answers).length < quizQuestions.length}
+                    >
+                      Yes, Submit
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
           
@@ -475,12 +595,32 @@ const ChallengeView = () => {
                       Time elapsed: {formatTime(timeElapsed)}
                     </p>
                   </div>
-                  <Button 
-                    onClick={handleSubmit} 
-                    disabled={!cadFile || !stlFile || Object.keys(answers).length < quizQuestions.length}
-                  >
-                    Submit Solution
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button>
+                        Submit Solution
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Submit your solution?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {(!cadFile || !stlFile || Object.keys(answers).length < quizQuestions.length) ? 
+                            "Your solution is incomplete. Please make sure you've uploaded all required files and answered all questions." :
+                            "Your solution will be submitted for evaluation. Are you ready to submit?"}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleSubmit}
+                          disabled={!cadFile || !stlFile || Object.keys(answers).length < quizQuestions.length}
+                        >
+                          Yes, Submit
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </CardFooter>
               </Card>
               
