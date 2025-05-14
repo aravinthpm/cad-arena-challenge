@@ -78,10 +78,15 @@ const ChallengeView = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  // State for challenge phases
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [challengeStarted, setChallengeStarted] = useState(false);
+  const [confirmSubmit, setConfirmSubmit] = useState(false);
+  const [confirmGiveUp, setConfirmGiveUp] = useState(false);
+  
   // State for timer
   const [timeElapsed, setTimeElapsed] = useState(0);
-  const [timerActive, setTimerActive] = useState(false); // Changed to false initially
-  const [challengeStarted, setChallengeStarted] = useState(false);
+  const [timerActive, setTimerActive] = useState(false);
   
   // State for file uploads
   const [cadFile, setCadFile] = useState<File | null>(null);
@@ -97,11 +102,11 @@ const ChallengeView = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
   
-  // Start timer only when challengeStarted is true
+  // Start timer only when challengeStarted is true and not showing instructions
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     
-    if (timerActive && challengeStarted) {
+    if (timerActive && challengeStarted && !showInstructions) {
       interval = setInterval(() => {
         setTimeElapsed(prev => prev + 1);
       }, 1000);
@@ -110,10 +115,11 @@ const ChallengeView = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timerActive, challengeStarted]);
+  }, [timerActive, challengeStarted, showInstructions]);
 
   // Start the challenge and timer
   const startChallenge = () => {
+    setShowInstructions(false);
     setChallengeStarted(true);
     setTimerActive(true);
   };
@@ -194,8 +200,8 @@ const ChallengeView = () => {
     navigate("/practice");
   };
   
-  // Welcome screen if challenge hasn't started
-  if (!challengeStarted) {
+  // Instructions screen - always show first before challenge starts
+  if (showInstructions) {
     return (
       <div className="flex flex-col min-h-screen">
         <Navbar />
@@ -295,7 +301,7 @@ const ChallengeView = () => {
               </div>
             </div>
             <div className="mt-4 md:mt-0 flex gap-2">
-              <AlertDialog>
+              <AlertDialog open={confirmGiveUp} onOpenChange={setConfirmGiveUp}>
                 <AlertDialogTrigger asChild>
                   <Button variant="outline">Give Up</Button>
                 </AlertDialogTrigger>
@@ -307,7 +313,7 @@ const ChallengeView = () => {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel onClick={() => setConfirmGiveUp(false)}>Cancel</AlertDialogCancel>
                     <AlertDialogAction onClick={handleGiveUp} className="bg-red-600 hover:bg-red-700">
                       Yes, Give Up
                     </AlertDialogAction>
@@ -315,7 +321,7 @@ const ChallengeView = () => {
                 </AlertDialogContent>
               </AlertDialog>
               
-              <AlertDialog>
+              <AlertDialog open={confirmSubmit} onOpenChange={setConfirmSubmit}>
                 <AlertDialogTrigger asChild>
                   <Button>Submit Challenge</Button>
                 </AlertDialogTrigger>
@@ -329,7 +335,7 @@ const ChallengeView = () => {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel onClick={() => setConfirmSubmit(false)}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleSubmit}
                       disabled={!cadFile || !stlFile || Object.keys(answers).length < quizQuestions.length}
@@ -595,32 +601,9 @@ const ChallengeView = () => {
                       Time elapsed: {formatTime(timeElapsed)}
                     </p>
                   </div>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button>
-                        Submit Solution
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Submit your solution?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {(!cadFile || !stlFile || Object.keys(answers).length < quizQuestions.length) ? 
-                            "Your solution is incomplete. Please make sure you've uploaded all required files and answered all questions." :
-                            "Your solution will be submitted for evaluation. Are you ready to submit?"}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleSubmit}
-                          disabled={!cadFile || !stlFile || Object.keys(answers).length < quizQuestions.length}
-                        >
-                          Yes, Submit
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <Button onClick={() => setConfirmSubmit(true)}>
+                    Submit Solution
+                  </Button>
                 </CardFooter>
               </Card>
               
