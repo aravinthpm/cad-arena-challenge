@@ -1,7 +1,8 @@
 
 import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartBar } from "lucide-react";
+import { Calendar } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 type ActivityLevel = 0 | 1 | 2 | 3 | 4;
 
@@ -71,114 +72,147 @@ export default function ActivityCalendar({ data }: ActivityCalendarProps) {
     return mockData;
   }, [data]);
 
-  // Generate months for the header
-  const calendarMonths = useMemo(() => {
-    if (!activityData.length) return [];
-    
-    const months: string[] = [];
-    let currentMonth = -1;
+  // Generate calendar data organized by months
+  const calendarData = useMemo(() => {
+    // Group activities by month
+    const months: { [key: string]: ActivityDay[][] } = {};
     
     activityData.forEach(day => {
-      const month = day.date.getMonth();
-      if (month !== currentMonth) {
-        currentMonth = month;
-        months.push(day.date.toLocaleString('default', { month: 'short' }));
-      }
-    });
-    
-    // Ensure we have a reasonable number of months displayed (around 12)
-    if (months.length > 12) {
-      const step = Math.ceil(months.length / 12);
-      return months.filter((_, i) => i % step === 0);
-    }
-    
-    return months;
-  }, [activityData]);
-
-  // Calculate weeks for the grid
-  const calendarWeeks = useMemo(() => {
-    if (!activityData.length) return [];
-    
-    const weeks: ActivityDay[][] = [];
-    let currentWeek: ActivityDay[] = [];
-    let currentDayOfWeek = activityData[0].date.getDay();
-    
-    // Fill in missing days at the start of the first week
-    for (let i = 0; i < currentDayOfWeek; i++) {
-      currentWeek.push({
-        date: new Date(),
-        count: 0,
-        level: 0
-      });
-    }
-    
-    activityData.forEach(day => {
-      if (currentWeek.length === 7) {
-        weeks.push([...currentWeek]);
-        currentWeek = [];
+      const date = day.date;
+      const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+      
+      if (!months[monthKey]) {
+        // Initialize month with empty weeks
+        months[monthKey] = [];
+        
+        // Get first day of month
+        const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+        const firstDayOfWeek = firstDay.getDay();
+        
+        // Fill in empty days at the beginning
+        let currentWeek: ActivityDay[] = [];
+        for (let i = 0; i < firstDayOfWeek; i++) {
+          currentWeek.push({
+            date: new Date(firstDay),
+            count: 0,
+            level: 0
+          });
+        }
+        
+        months[monthKey].push(currentWeek);
       }
       
+      let currentWeek = months[monthKey][months[monthKey].length - 1];
+      
+      // Start a new week if current week is full
+      if (currentWeek.length === 7) {
+        currentWeek = [];
+        months[monthKey].push(currentWeek);
+      }
+      
+      // Add day to current week
       currentWeek.push(day);
     });
     
-    // Fill in the last week if needed
-    if (currentWeek.length > 0) {
-      while (currentWeek.length < 7) {
-        currentWeek.push({
-          date: new Date(),
-          count: 0,
-          level: 0
-        });
-      }
-      weeks.push(currentWeek);
+    return months;
+  }, [activityData]);
+  
+  // Get last 6 months of data
+  const recentMonths = useMemo(() => {
+    const today = new Date();
+    const months = [];
+    
+    for (let i = 0; i < 6; i++) {
+      const monthDate = new Date(today);
+      monthDate.setMonth(today.getMonth() - i);
+      months.push({
+        date: monthDate,
+        key: `${monthDate.getFullYear()}-${monthDate.getMonth() + 1}`,
+        name: monthDate.toLocaleString('default', { month: 'short' }),
+        year: monthDate.getFullYear()
+      });
     }
     
-    return weeks;
-  }, [activityData]);
+    return months.reverse();
+  }, []);
 
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center text-lg font-bold">
-          <ChartBar className="mr-2 h-5 w-5 text-primary" />
+          <Calendar className="mr-2 h-5 w-5 text-primary" />
           Contribution Activity
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-xs text-muted-foreground flex justify-between pb-2">
-          {calendarMonths.map((month) => (
-            <span key={month} className="flex-1 text-center">
-              {month}
-            </span>
-          ))}
-        </div>
-        
-        <div className="grid grid-flow-col gap-1">
-          {calendarWeeks.map((week, weekIdx) => (
-            <div key={weekIdx} className="grid grid-flow-row gap-1">
-              {week.map((day, dayIdx) => {
-                const dateStr = day.count > 0 ? 
-                  `${day.count} contributions on ${day.date.toDateString()}` : 
-                  "No contributions";
-                
-                return (
-                  <div
-                    key={`${weekIdx}-${dayIdx}`}
-                    className={`w-3 h-3 rounded-sm transition-colors hover:ring-2 hover:ring-offset-1 hover:ring-primary ${
-                      day.level === 0
-                        ? "bg-gray-100 dark:bg-gray-700"
-                        : day.level === 1
-                        ? "bg-green-100 dark:bg-green-900"
-                        : day.level === 2
-                        ? "bg-green-300 dark:bg-green-700"
-                        : day.level === 3
-                        ? "bg-green-500 dark:bg-green-500"
-                        : "bg-green-700 dark:bg-green-300"
-                    }`}
-                    title={dateStr}
-                  />
-                );
-              })}
+        <div className="space-y-6">
+          {recentMonths.map((month) => (
+            <div key={month.key} className="space-y-2">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                {month.name} {month.year}
+              </h3>
+              
+              {calendarData[month.key] && (
+                <div className="grid grid-cols-7 gap-1">
+                  {/* Weekday headers */}
+                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+                    <div key={idx} className="text-xs text-center text-gray-400">
+                      {day}
+                    </div>
+                  ))}
+                  
+                  {/* Calendar cells */}
+                  {calendarData[month.key].flatMap((week, weekIdx) => 
+                    week.map((day, dayIdx) => {
+                      const dayNum = day.date.getDate();
+                      const hasActivity = day.count > 0;
+                      const dateStr = day.count > 0 ? 
+                        `${day.count} contributions on ${day.date.toDateString()}` : 
+                        "No contributions";
+                      
+                      return (
+                        <Popover key={`${weekIdx}-${dayIdx}`}>
+                          <PopoverTrigger asChild>
+                            <div
+                              className={`aspect-square w-full rounded-sm flex items-center justify-center transition-colors ${
+                                day.level === 0
+                                  ? "bg-gray-100 dark:bg-gray-700"
+                                  : day.level === 1
+                                  ? "bg-green-100 dark:bg-green-900"
+                                  : day.level === 2
+                                  ? "bg-green-300 dark:bg-green-700"
+                                  : day.level === 3
+                                  ? "bg-green-500 dark:bg-green-500"
+                                  : "bg-green-700 dark:bg-green-300"
+                              } ${hasActivity ? 'cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-primary' : ''}`}
+                            >
+                              <span className={`text-xs font-medium ${hasActivity ? 'text-white dark:text-gray-900' : 'text-gray-400 dark:text-gray-600'}`}>
+                                {dayNum}
+                              </span>
+                            </div>
+                          </PopoverTrigger>
+                          {hasActivity && (
+                            <PopoverContent className="w-60 p-3" side="top">
+                              <div className="space-y-1">
+                                <p className="font-medium">{day.date.toDateString()}</p>
+                                <p className="text-sm">{day.count} contributions</p>
+                                <div className="flex items-center pt-1">
+                                  <div className="h-2 w-2 rounded-full bg-green-500 mr-1"></div>
+                                  <p className="text-xs text-gray-500">{Math.round(day.count * 0.8)} solved challenges</p>
+                                </div>
+                                <div className="flex items-center">
+                                  <div className="h-2 w-2 rounded-full bg-blue-500 mr-1"></div>
+                                  <p className="text-xs text-gray-500">{Math.round(day.count * 0.2)} comments</p>
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          )}
+                        </Popover>
+                      );
+                    })
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>

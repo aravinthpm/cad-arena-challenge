@@ -1,8 +1,8 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
-import { Gauge, ChartLine } from "lucide-react";
+import { Gauge, ChartLine, Timer } from "lucide-react";
 import {
   PieChart,
   Pie,
@@ -13,8 +13,12 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar
 } from "recharts";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 interface UserStatsProps {
   completedChallenges: number;
@@ -38,6 +42,13 @@ export default function UserStats({
     { month: "May", rank: 190 },
     { month: "Jun", rank: 150 },
     { month: "Jul", rank: 124 },
+  ];
+
+  // Mock data for difficulty breakdown
+  const difficultyData = [
+    { name: "Easy", value: 26, color: "#10b981", avgTime: "14 min" },
+    { name: "Medium", value: 11, color: "#f59e0b", avgTime: "38 min" },
+    { name: "Hard", value: 5, color: "#ef4444", avgTime: "62 min" },
   ];
 
   // Calculation for challenge completion percentage
@@ -87,6 +98,37 @@ export default function UserStats({
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
+
+                {/* Difficulty breakdown */}
+                <div className="mt-4">
+                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Difficulty Breakdown
+                  </div>
+                  <div className="flex items-center space-x-2 mt-2">
+                    {difficultyData.map((item) => (
+                      <HoverCard key={item.name}>
+                        <HoverCardTrigger asChild>
+                          <div className="flex flex-col items-center">
+                            <div className="text-xs font-medium" style={{ color: item.color }}>
+                              {item.name}
+                            </div>
+                            <div className="text-sm font-bold">{item.value}</div>
+                          </div>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-60">
+                          <div className="flex justify-between">
+                            <div className="font-medium">{item.name} Challenges</div>
+                            <div className="font-bold">{item.value}</div>
+                          </div>
+                          <div className="flex items-center mt-2 text-sm text-gray-500">
+                            <Timer className="h-3 w-3 mr-1" /> 
+                            <span>Average completion time: {item.avgTime}</span>
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
+                    ))}
+                  </div>
+                </div>
               </div>
               
               <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-4 rounded-lg shadow-sm">
@@ -116,6 +158,39 @@ export default function UserStats({
                         <Cell fill="#e5e7eb" />
                       </Pie>
                     </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Points by difficulty */}
+                <div className="mt-4 h-24">
+                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Points by Difficulty
+                  </div>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={[
+                        { name: "Easy", points: 520, color: "#10b981" },
+                        { name: "Medium", points: 480, color: "#f59e0b" },
+                        { name: "Hard", points: 250, color: "#ef4444" },
+                      ]}
+                      margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+                    >
+                      <XAxis dataKey="name" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <Tooltip
+                        formatter={(value) => [`${value} points`, '']}
+                        contentStyle={{
+                          backgroundColor: 'rgba(255,255,255,0.9)',
+                          borderRadius: '0.5rem',
+                          border: '1px solid #e5e7eb',
+                          fontSize: '0.75rem',
+                        }}
+                      />
+                      <Bar dataKey="points" fill="#8884d8">
+                        {difficultyData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Bar>
+                    </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>

@@ -1,7 +1,8 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Code } from "lucide-react";
+import { Code, Timer, Award, Trophy, CheckCircle } from "lucide-react";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 interface ActivityItem {
   id: string;
@@ -11,6 +12,9 @@ interface ActivityItem {
   points?: number;
   difficulty?: "easy" | "medium" | "hard";
   language?: string;
+  timeToComplete?: string;
+  accuracy?: number;
+  imageUrl?: string;
 }
 
 interface RecentActivityProps {
@@ -22,39 +26,42 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
   const activityData = activities.length > 0 ? activities : [
     {
       id: "1",
-      title: "Completed Industrial Equipment Design Challenge",
+      title: "Industrial Equipment Design Challenge",
       type: "challenge",
       date: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
       points: 50,
       difficulty: "medium",
-      language: "JavaScript"
+      language: "JavaScript",
+      timeToComplete: "48m 32s",
+      accuracy: 92,
+      imageUrl: "/placeholder.svg"
     },
     {
       id: "2",
       title: "Earned Problem Solver Badge",
       type: "achievement",
       date: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+      imageUrl: "/placeholder.svg"
     },
     {
       id: "3",
-      title: "Joined Sustainable Packaging Competition",
+      title: "Sustainable Packaging Competition",
       type: "competition",
       date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
+      points: 120,
+      imageUrl: "/placeholder.svg"
     },
     {
       id: "4",
-      title: "Completed Mechanical Parts Modeling Challenge",
+      title: "Mechanical Parts Modeling Challenge",
       type: "challenge",
       date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), // 3 days ago
       points: 35,
       difficulty: "easy",
-      language: "Python"
-    },
-    {
-      id: "5",
-      title: "Started 7-day streak",
-      type: "achievement",
-      date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), // 7 days ago
+      language: "Python",
+      timeToComplete: "27m 12s",
+      accuracy: 85,
+      imageUrl: "/placeholder.svg"
     },
   ];
 
@@ -95,41 +102,100 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
     );
   };
 
+  // Get the right icon based on activity type
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case "challenge":
+        return <Code className="h-5 w-5 text-primary" />;
+      case "achievement":
+        return <Award className="h-5 w-5 text-yellow-500" />;
+      case "competition":
+        return <Trophy className="h-5 w-5 text-blue-500" />;
+      default:
+        return <CheckCircle className="h-5 w-5 text-primary" />;
+    }
+  };
+
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center text-lg font-bold">
-          <Code className="mr-2 h-5 w-5 text-primary" />
+          <CheckCircle className="mr-2 h-5 w-5 text-primary" />
           Recent Practice
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {activityData.map((activity) => (
-            <div key={activity.id} className="border-b pb-3 last:border-0 last:pb-0">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-medium">{activity.title}</p>
-                  <div className="flex items-center mt-1">
-                    {activity.type === "challenge" && activity.difficulty && 
-                      getDifficultyBadge(activity.difficulty)}
-                    
-                    {activity.language && (
-                      <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 px-2 py-1 rounded font-medium mr-2">
-                        {activity.language}
-                      </span>
-                    )}
-                    
-                    <p className="text-sm text-muted-foreground">
-                      {getRelativeTime(activity.date)}
-                    </p>
-                  </div>
+            <div 
+              key={activity.id} 
+              className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex gap-4">
+                <div className="w-12 h-12 rounded-md bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
+                  {getActivityIcon(activity.type)}
                 </div>
-                {activity.points && (
-                  <div className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 px-2 py-1 rounded text-xs font-medium">
-                    +{activity.points} pts
+                
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-medium text-sm md:text-base">{activity.title}</h3>
+                      <div className="flex flex-wrap items-center mt-1 gap-1">
+                        {activity.type === "challenge" && activity.difficulty && 
+                          getDifficultyBadge(activity.difficulty)}
+                        
+                        {activity.language && (
+                          <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 px-2 py-1 rounded font-medium">
+                            {activity.language}
+                          </span>
+                        )}
+                        
+                        <span className="text-xs text-muted-foreground">
+                          {getRelativeTime(activity.date)}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {activity.points && (
+                      <div className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 px-2 py-1 rounded text-xs font-medium">
+                        +{activity.points} pts
+                      </div>
+                    )}
                   </div>
-                )}
+                  
+                  {activity.type === "challenge" && activity.timeToComplete && (
+                    <div className="flex items-center mt-3 space-x-3 text-xs text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center">
+                        <Timer className="h-3 w-3 mr-1" />
+                        <span>{activity.timeToComplete}</span>
+                      </div>
+                      
+                      {activity.accuracy && (
+                        <HoverCard>
+                          <HoverCardTrigger asChild>
+                            <div className="flex items-center cursor-help">
+                              <div className="relative w-16 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                                <div 
+                                  className="absolute top-0 left-0 h-full bg-green-500 dark:bg-green-400"
+                                  style={{ width: `${activity.accuracy}%` }}
+                                ></div>
+                              </div>
+                              <span className="ml-1">{activity.accuracy}%</span>
+                            </div>
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-60">
+                            <div className="space-y-1">
+                              <p className="font-medium">Accuracy Score</p>
+                              <p className="text-sm text-gray-500">
+                                {activity.accuracy}% of your solution matched the expected output.
+                              </p>
+                            </div>
+                          </HoverCardContent>
+                        </HoverCard>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
