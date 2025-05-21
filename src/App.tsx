@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import ProfileEdit from "./pages/ProfileEdit";
 import Practice from "./pages/Practice";
 import ChallengeView from "./pages/ChallengeView";
 import Competitions from "./pages/Competitions";
@@ -37,6 +38,7 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile/edit" element={<ProfileEdit />} />
             <Route path="/practice" element={<Practice />} />
             <Route path="/challenge/:id" element={<ChallengeView />} />
             <Route path="/competitions" element={<Competitions />} />
