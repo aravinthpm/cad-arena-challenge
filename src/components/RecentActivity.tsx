@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Code, Timer, Award, Trophy, CheckCircle } from "lucide-react";
+import { Code, Timer, Award, Trophy, CheckCircle, Clock, FileText } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 interface ActivityItem {
@@ -15,6 +15,8 @@ interface ActivityItem {
   timeToComplete?: string;
   accuracy?: number;
   imageUrl?: string;
+  description?: string;
+  model?: string;
 }
 
 interface RecentActivityProps {
@@ -34,7 +36,9 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
       language: "JavaScript",
       timeToComplete: "48m 32s",
       accuracy: 92,
-      imageUrl: "/placeholder.svg"
+      imageUrl: "/placeholder.svg",
+      description: "Create a responsive design for industrial equipment interface",
+      model: "Design System Model"
     },
     {
       id: "2",
@@ -49,7 +53,8 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
       type: "competition",
       date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
       points: 120,
-      imageUrl: "/placeholder.svg"
+      imageUrl: "/placeholder.svg",
+      model: "Packaging Analysis Model"
     },
     {
       id: "4",
@@ -61,7 +66,9 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
       language: "Python",
       timeToComplete: "27m 12s",
       accuracy: 85,
-      imageUrl: "/placeholder.svg"
+      imageUrl: "/placeholder.svg",
+      description: "Build a model that can detect mechanical parts",
+      model: "Parts Recognition Model"
     },
   ];
 
@@ -106,7 +113,7 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
   const getActivityIcon = (type: string) => {
     switch (type) {
       case "challenge":
-        return <Code className="h-5 w-5 text-primary" />;
+        return <FileText className="h-5 w-5 text-primary" />;
       case "achievement":
         return <Award className="h-5 w-5 text-yellow-500" />;
       case "competition":
@@ -120,67 +127,92 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
     <Card className="shadow-md hover:shadow-lg transition-shadow">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center text-lg font-bold">
-          <CheckCircle className="mr-2 h-5 w-5 text-primary" />
+          <Clock className="mr-2 h-5 w-5 text-primary" />
           Recent Practice
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {activityData.map((activity) => (
             <div 
               key={activity.id} 
-              className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow"
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow"
             >
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-md bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
-                  {getActivityIcon(activity.type)}
-                </div>
-                
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium text-sm md:text-base">{activity.title}</h3>
-                      <div className="flex flex-wrap items-center mt-1 gap-1">
-                        {activity.type === "challenge" && activity.difficulty && 
-                          getDifficultyBadge(activity.difficulty)}
-                        
-                        {activity.language && (
-                          <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 px-2 py-1 rounded font-medium">
-                            {activity.language}
-                          </span>
-                        )}
-                        
-                        <span className="text-xs text-muted-foreground">
-                          {getRelativeTime(activity.date)}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {activity.points && (
-                      <div className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 px-2 py-1 rounded text-xs font-medium">
-                        +{activity.points} pts
-                      </div>
-                    )}
+              <div className="relative">
+                {/* Image banner */}
+                <div className="h-24 bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+                  {activity.imageUrl ? (
+                    <img 
+                      src={activity.imageUrl} 
+                      alt={activity.title} 
+                      className="w-full h-full object-cover opacity-50"
+                    />
+                  ) : null}
+                  
+                  <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4">
+                    <h3 className="font-semibold text-white text-center text-sm md:text-base line-clamp-2">
+                      {activity.title}
+                    </h3>
                   </div>
                   
-                  {activity.type === "challenge" && activity.timeToComplete && (
-                    <div className="flex items-center mt-3 space-x-3 text-xs text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center">
-                        <Timer className="h-3 w-3 mr-1" />
-                        <span>{activity.timeToComplete}</span>
-                      </div>
+                  {/* Activity type indicator */}
+                  <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center shadow">
+                    {getActivityIcon(activity.type)}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-4">
+                {/* Info row */}
+                <div className="flex flex-wrap items-center gap-1 mb-2">
+                  {activity.type === "challenge" && activity.difficulty && 
+                    getDifficultyBadge(activity.difficulty)}
+                  
+                  {activity.language && (
+                    <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 px-2 py-1 rounded font-medium">
+                      {activity.language}
+                    </span>
+                  )}
+                  
+                  {activity.model && (
+                    <span className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100 px-2 py-1 rounded font-medium">
+                      {activity.model}
+                    </span>
+                  )}
+                </div>
+                
+                {/* Date and points */}
+                <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  <span>{getRelativeTime(activity.date)}</span>
+                  {activity.points && (
+                    <div className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 px-2 py-1 rounded font-medium">
+                      +{activity.points} pts
+                    </div>
+                  )}
+                </div>
+                
+                {/* Additional stats for challenges */}
+                {activity.type === "challenge" && (
+                  <div className="mt-2 border-t border-gray-100 dark:border-gray-700 pt-2">
+                    <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
+                      {activity.timeToComplete && (
+                        <div className="flex items-center">
+                          <Timer className="h-3 w-3 mr-1" />
+                          <span>{activity.timeToComplete}</span>
+                        </div>
+                      )}
                       
                       {activity.accuracy && (
                         <HoverCard>
                           <HoverCardTrigger asChild>
                             <div className="flex items-center cursor-help">
-                              <div className="relative w-16 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                              <div className="relative w-16 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden mr-1">
                                 <div 
                                   className="absolute top-0 left-0 h-full bg-green-500 dark:bg-green-400"
                                   style={{ width: `${activity.accuracy}%` }}
                                 ></div>
                               </div>
-                              <span className="ml-1">{activity.accuracy}%</span>
+                              <span>{activity.accuracy}%</span>
                             </div>
                           </HoverCardTrigger>
                           <HoverCardContent className="w-60">
@@ -194,8 +226,8 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
                         </HoverCard>
                       )}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}

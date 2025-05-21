@@ -16,7 +16,9 @@ import {
   Tooltip,
   Legend,
   BarChart,
-  Bar
+  Bar,
+  LineChart,
+  Line
 } from "recharts";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
@@ -33,6 +35,9 @@ export default function UserStats({
   currentStreak = 7,
   rank = 124
 }: UserStatsProps) {
+  const [showRankChart, setShowRankChart] = useState(false);
+  const [showPointsChart, setShowPointsChart] = useState(false);
+
   // Generate mock rank history data
   const rankHistory = [
     { month: "Jan", rank: 350 },
@@ -42,6 +47,17 @@ export default function UserStats({
     { month: "May", rank: 190 },
     { month: "Jun", rank: 150 },
     { month: "Jul", rank: 124 },
+  ];
+
+  // Generate mock points history data
+  const pointsHistory = [
+    { month: "Jan", points: 180 },
+    { month: "Feb", points: 320 },
+    { month: "Mar", points: 250 },
+    { month: "Apr", points: 410 },
+    { month: "May", points: 280 },
+    { month: "Jun", points: 220 },
+    { month: "Jul", points: 350 },
   ];
 
   // Mock data for difficulty breakdown
@@ -99,16 +115,13 @@ export default function UserStats({
                   </ResponsiveContainer>
                 </div>
 
-                {/* Difficulty breakdown */}
-                <div className="mt-4">
-                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    Difficulty Breakdown
-                  </div>
-                  <div className="flex items-center space-x-2 mt-2">
+                {/* Difficulty breakdown moved to the right side of charts */}
+                <div className="mt-2 flex justify-end">
+                  <div className="flex items-center space-x-3">
                     {difficultyData.map((item) => (
                       <HoverCard key={item.name}>
                         <HoverCardTrigger asChild>
-                          <div className="flex flex-col items-center">
+                          <div className="flex flex-col items-center cursor-help">
                             <div className="text-xs font-medium" style={{ color: item.color }}>
                               {item.name}
                             </div>
@@ -137,61 +150,78 @@ export default function UserStats({
                   <div className="text-3xl font-bold">{totalPoints}</div>
                   <div className="text-xs text-gray-400">2000 max</div>
                 </div>
-                <div className="mt-2 h-20">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={[
-                          { name: "Earned", value: pointsPercentage },
-                          { name: "Remaining", value: 100 - pointsPercentage }
-                        ]}
-                        cx="50%"
-                        cy="50%"
-                        startAngle={180}
-                        endAngle={0}
-                        innerRadius="60%"
-                        outerRadius="100%"
-                        paddingAngle={0}
-                        dataKey="value"
-                      >
-                        <Cell fill="#8b5cf6" />
-                        <Cell fill="#e5e7eb" />
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-
-                {/* Points by difficulty */}
-                <div className="mt-4 h-24">
-                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    Points by Difficulty
-                  </div>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={[
-                        { name: "Easy", points: 520, color: "#10b981" },
-                        { name: "Medium", points: 480, color: "#f59e0b" },
-                        { name: "Hard", points: 250, color: "#ef4444" },
-                      ]}
-                      margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+                <HoverCard open={showPointsChart} onOpenChange={setShowPointsChart}>
+                  <HoverCardTrigger asChild>
+                    <div 
+                      className="mt-2 h-20 cursor-pointer"
+                      onMouseEnter={() => setShowPointsChart(true)}
+                      onMouseLeave={() => setShowPointsChart(false)}
                     >
-                      <XAxis dataKey="name" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <Tooltip
-                        formatter={(value) => [`${value} points`, '']}
-                        contentStyle={{
-                          backgroundColor: 'rgba(255,255,255,0.9)',
-                          borderRadius: '0.5rem',
-                          border: '1px solid #e5e7eb',
-                          fontSize: '0.75rem',
-                        }}
-                      />
-                      <Bar dataKey="points" fill="#8884d8">
-                        {difficultyData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={[
+                              { name: "Earned", value: pointsPercentage },
+                              { name: "Remaining", value: 100 - pointsPercentage }
+                            ]}
+                            cx="50%"
+                            cy="50%"
+                            startAngle={180}
+                            endAngle={0}
+                            innerRadius="60%"
+                            outerRadius="100%"
+                            paddingAngle={0}
+                            dataKey="value"
+                          >
+                            <Cell fill="#8b5cf6" />
+                            <Cell fill="#e5e7eb" />
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-64">
+                    <div className="space-y-1">
+                      <p className="font-medium">Points by Month</p>
+                      <div className="h-32">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={pointsHistory} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+                            <YAxis tick={{ fontSize: 10 }} />
+                            <Tooltip 
+                              formatter={(value) => [`${value} points`, 'Points']}
+                              contentStyle={{
+                                backgroundColor: 'rgba(255,255,255,0.9)',
+                                borderRadius: '0.5rem',
+                                border: '1px solid #e5e7eb',
+                                fontSize: '0.75rem',
+                              }}
+                            />
+                            <Line type="monotone" dataKey="points" stroke="#8b5cf6" activeDot={{ r: 5 }} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
+
+                {/* Points by difficulty - moved to the right of the chart */}
+                <div className="mt-2 flex justify-end">
+                  <div className="flex items-center space-x-3">
+                    {[
+                      { name: "Easy", points: 520, color: "#10b981" },
+                      { name: "Medium", points: 480, color: "#f59e0b" }, 
+                      { name: "Hard", points: 250, color: "#ef4444" }
+                    ].map((item) => (
+                      <div key={item.name} className="flex flex-col items-center">
+                        <div className="text-xs font-medium" style={{ color: item.color }}>
+                          {item.name}
+                        </div>
+                        <div className="text-xs font-bold">{item.points}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -227,18 +257,62 @@ export default function UserStats({
               
               <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-4 rounded-lg shadow-sm">
                 <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Rank</div>
-                <div className="text-3xl font-bold">#{rank}</div>
-                <div className="mt-2 text-xs text-green-500 flex items-center">
-                  <span>↑ 26 this month</span>
-                </div>
+                <HoverCard open={showRankChart} onOpenChange={setShowRankChart}>
+                  <HoverCardTrigger asChild>
+                    <div 
+                      className="cursor-pointer" 
+                      onMouseEnter={() => setShowRankChart(true)}
+                      onMouseLeave={() => setShowRankChart(false)}
+                    >
+                      <div className="text-3xl font-bold">#{rank}</div>
+                      <div className="mt-2 text-xs text-green-500 flex items-center">
+                        <span>↑ 26 this month</span>
+                      </div>
+                    </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-64">
+                    <div className="space-y-1">
+                      <p className="font-medium">Rank Progress</p>
+                      <div className="h-32">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart 
+                            data={rankHistory} 
+                            margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+                            <YAxis 
+                              reversed 
+                              tick={{ fontSize: 10 }} 
+                              domain={['dataMin', 'dataMax']} 
+                            />
+                            <Tooltip 
+                              formatter={(value) => [`#${value}`, 'Rank']}
+                              contentStyle={{
+                                backgroundColor: 'rgba(255,255,255,0.9)',
+                                borderRadius: '0.5rem',
+                                border: '1px solid #e5e7eb',
+                                fontSize: '0.75rem',
+                              }}
+                            />
+                            <Line type="monotone" dataKey="rank" stroke="#8b5cf6" activeDot={{ r: 5 }} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="text-xs text-center text-gray-500 mt-1">
+                        Lower rank number is better
+                      </div>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
               </div>
             </div>
           </div>
           
-          {/* Right column - Rank Graph */}
+          {/* Right column - removed rank graph as it's now shown on hover */}
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg shadow-sm p-4">
             <div className="flex items-center justify-between mb-2">
-              <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Rank Progress</div>
+              <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Recent Activity</div>
               <ChartLine className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             </div>
             <div className="h-[180px]">

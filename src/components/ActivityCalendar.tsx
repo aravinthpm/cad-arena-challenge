@@ -72,6 +72,25 @@ export default function ActivityCalendar({ data }: ActivityCalendarProps) {
     return mockData;
   }, [data]);
 
+  // Get the most recent 3 months for the compact calendar view
+  const recentMonths = useMemo(() => {
+    const today = new Date();
+    const months = [];
+    
+    for (let i = 0; i < 3; i++) {
+      const monthDate = new Date(today);
+      monthDate.setMonth(today.getMonth() - i);
+      months.push({
+        date: monthDate,
+        key: `${monthDate.getFullYear()}-${monthDate.getMonth() + 1}`,
+        name: monthDate.toLocaleString('default', { month: 'short' }),
+        year: monthDate.getFullYear()
+      });
+    }
+    
+    return months.reverse();
+  }, []);
+
   // Generate calendar data organized by months
   const calendarData = useMemo(() => {
     // Group activities by month
@@ -117,25 +136,6 @@ export default function ActivityCalendar({ data }: ActivityCalendarProps) {
     return months;
   }, [activityData]);
   
-  // Get last 6 months of data
-  const recentMonths = useMemo(() => {
-    const today = new Date();
-    const months = [];
-    
-    for (let i = 0; i < 6; i++) {
-      const monthDate = new Date(today);
-      monthDate.setMonth(today.getMonth() - i);
-      months.push({
-        date: monthDate,
-        key: `${monthDate.getFullYear()}-${monthDate.getMonth() + 1}`,
-        name: monthDate.toLocaleString('default', { month: 'short' }),
-        year: monthDate.getFullYear()
-      });
-    }
-    
-    return months.reverse();
-  }, []);
-
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow">
       <CardHeader className="pb-2">
@@ -144,24 +144,24 @@ export default function ActivityCalendar({ data }: ActivityCalendarProps) {
           Contribution Activity
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
+      <CardContent className="p-2 sm:p-4">
+        <div className="space-y-4">
           {recentMonths.map((month) => (
-            <div key={month.key} className="space-y-2">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <div key={month.key} className="space-y-1">
+              <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400">
                 {month.name} {month.year}
               </h3>
               
               {calendarData[month.key] && (
-                <div className="grid grid-cols-7 gap-1">
-                  {/* Weekday headers */}
+                <div className="grid grid-cols-7 gap-0.5">
+                  {/* Weekday headers - using initials only for compact display */}
                   {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
-                    <div key={idx} className="text-xs text-center text-gray-400">
+                    <div key={idx} className="text-[9px] text-center text-gray-400">
                       {day}
                     </div>
                   ))}
                   
-                  {/* Calendar cells */}
+                  {/* Calendar cells - smaller size */}
                   {calendarData[month.key].flatMap((week, weekIdx) => 
                     week.map((day, dayIdx) => {
                       const dayNum = day.date.getDate();
@@ -174,7 +174,7 @@ export default function ActivityCalendar({ data }: ActivityCalendarProps) {
                         <Popover key={`${weekIdx}-${dayIdx}`}>
                           <PopoverTrigger asChild>
                             <div
-                              className={`aspect-square w-full rounded-sm flex items-center justify-center transition-colors ${
+                              className={`aspect-square w-full h-5 rounded-sm flex items-center justify-center transition-colors ${
                                 day.level === 0
                                   ? "bg-gray-100 dark:bg-gray-700"
                                   : day.level === 1
@@ -184,18 +184,18 @@ export default function ActivityCalendar({ data }: ActivityCalendarProps) {
                                   : day.level === 3
                                   ? "bg-green-500 dark:bg-green-500"
                                   : "bg-green-700 dark:bg-green-300"
-                              } ${hasActivity ? 'cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-primary' : ''}`}
+                              } ${hasActivity ? 'cursor-pointer hover:ring-1 hover:ring-offset-1 hover:ring-primary' : ''}`}
                             >
-                              <span className={`text-xs font-medium ${hasActivity ? 'text-white dark:text-gray-900' : 'text-gray-400 dark:text-gray-600'}`}>
+                              <span className={`text-[9px] font-medium ${hasActivity ? 'text-white dark:text-gray-900' : 'text-gray-400 dark:text-gray-600'}`}>
                                 {dayNum}
                               </span>
                             </div>
                           </PopoverTrigger>
                           {hasActivity && (
-                            <PopoverContent className="w-60 p-3" side="top">
+                            <PopoverContent className="w-56 p-2" side="top">
                               <div className="space-y-1">
-                                <p className="font-medium">{day.date.toDateString()}</p>
-                                <p className="text-sm">{day.count} contributions</p>
+                                <p className="font-medium text-sm">{day.date.toDateString()}</p>
+                                <p className="text-xs">{day.count} contributions</p>
                                 <div className="flex items-center pt-1">
                                   <div className="h-2 w-2 rounded-full bg-green-500 mr-1"></div>
                                   <p className="text-xs text-gray-500">{Math.round(day.count * 0.8)} solved challenges</p>
@@ -217,13 +217,13 @@ export default function ActivityCalendar({ data }: ActivityCalendarProps) {
           ))}
         </div>
         
-        <div className="flex items-center justify-end mt-3 gap-1 text-xs text-muted-foreground">
+        <div className="flex items-center justify-end mt-2 gap-1 text-[9px] text-muted-foreground">
           <span>Less</span>
-          <div className="w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-700"></div>
-          <div className="w-3 h-3 rounded-sm bg-green-100 dark:bg-green-900"></div>
-          <div className="w-3 h-3 rounded-sm bg-green-300 dark:bg-green-700"></div>
-          <div className="w-3 h-3 rounded-sm bg-green-500 dark:bg-green-500"></div>
-          <div className="w-3 h-3 rounded-sm bg-green-700 dark:bg-green-300"></div>
+          <div className="w-2 h-2 rounded-sm bg-gray-100 dark:bg-gray-700"></div>
+          <div className="w-2 h-2 rounded-sm bg-green-100 dark:bg-green-900"></div>
+          <div className="w-2 h-2 rounded-sm bg-green-300 dark:bg-green-700"></div>
+          <div className="w-2 h-2 rounded-sm bg-green-500 dark:bg-green-500"></div>
+          <div className="w-2 h-2 rounded-sm bg-green-700 dark:bg-green-300"></div>
           <span>More</span>
         </div>
       </CardContent>
