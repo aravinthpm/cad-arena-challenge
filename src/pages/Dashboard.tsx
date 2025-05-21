@@ -1,9 +1,10 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Code, Trophy, Building, User as UserIcon } from "lucide-react";
+import { Code, Trophy, Building, User as UserIcon, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 import Navbar from "@/components/Navbar";
@@ -96,7 +97,7 @@ const StudentDashboard = () => {
           {/* Activity Calendar */}
           <ActivityCalendar />
           
-          {/* Recent Activity */}
+          {/* Recent Activity - renamed to Recent Practice in the component */}
           <RecentActivity activities={[]} />
           
           {/* Featured Challenges */}

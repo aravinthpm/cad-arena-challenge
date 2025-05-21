@@ -1,6 +1,20 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartContainer } from "@/components/ui/chart";
+import { Gauge, ChartLine } from "lucide-react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip
+} from "recharts";
 
 interface UserStatsProps {
   completedChallenges: number;
@@ -15,31 +29,194 @@ export default function UserStats({
   currentStreak = 7,
   rank = 124
 }: UserStatsProps) {
+  // Generate mock rank history data
+  const rankHistory = [
+    { month: "Jan", rank: 350 },
+    { month: "Feb", rank: 280 },
+    { month: "Mar", rank: 320 },
+    { month: "Apr", rank: 260 },
+    { month: "May", rank: 190 },
+    { month: "Jun", rank: 150 },
+    { month: "Jul", rank: 124 },
+  ];
+
+  // Calculation for challenge completion percentage
+  const totalAvailableChallenges = 100; // Mock data
+  const completionPercentage = (completedChallenges / totalAvailableChallenges) * 100;
+  const pointsPercentage = (totalPoints / 2000) * 100; // Assuming 2000 is max points
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Quick Stats</CardTitle>
+    <Card className="shadow-md hover:shadow-lg transition-shadow">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center text-lg font-bold">
+          <Gauge className="mr-2 h-5 w-5 text-primary" />
+          Quick Stats
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Completed</div>
-            <div className="text-3xl font-bold">{completedChallenges}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left column - Stats with speedometers */}
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-4 rounded-lg shadow-sm">
+                <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Completed</div>
+                <div className="flex justify-between items-end">
+                  <div className="text-3xl font-bold">{completedChallenges}</div>
+                  <div className="text-xs text-gray-400">{totalAvailableChallenges} total</div>
+                </div>
+                <div className="mt-2 h-20">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: "Completed", value: completionPercentage },
+                          { name: "Remaining", value: 100 - completionPercentage }
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        startAngle={180}
+                        endAngle={0}
+                        innerRadius="60%"
+                        outerRadius="100%"
+                        paddingAngle={0}
+                        dataKey="value"
+                      >
+                        <Cell fill="#10b981" />
+                        <Cell fill="#e5e7eb" />
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-4 rounded-lg shadow-sm">
+                <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Points</div>
+                <div className="flex justify-between items-end">
+                  <div className="text-3xl font-bold">{totalPoints}</div>
+                  <div className="text-xs text-gray-400">2000 max</div>
+                </div>
+                <div className="mt-2 h-20">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: "Earned", value: pointsPercentage },
+                          { name: "Remaining", value: 100 - pointsPercentage }
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        startAngle={180}
+                        endAngle={0}
+                        innerRadius="60%"
+                        outerRadius="100%"
+                        paddingAngle={0}
+                        dataKey="value"
+                      >
+                        <Cell fill="#8b5cf6" />
+                        <Cell fill="#e5e7eb" />
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-4 rounded-lg shadow-sm">
+                <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Streak</div>
+                <div className="flex justify-between items-end">
+                  <div className="text-3xl font-bold">{currentStreak}</div>
+                  <div className="text-xs text-gray-400">days</div>
+                </div>
+                <div className="mt-2 flex justify-center">
+                  <div className="flex items-end space-x-1">
+                    {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                      <div
+                        key={day}
+                        className={`w-2 ${
+                          day <= currentStreak
+                            ? "bg-yellow-500 dark:bg-yellow-400"
+                            : "bg-gray-200 dark:bg-gray-700"
+                        } rounded-t`}
+                        style={{ 
+                          height: `${Math.min(
+                            Math.max(16 + (day <= currentStreak ? day * 4 : 0), 16),
+                            36
+                          )}px` 
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-4 rounded-lg shadow-sm">
+                <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Rank</div>
+                <div className="text-3xl font-bold">#{rank}</div>
+                <div className="mt-2 text-xs text-green-500 flex items-center">
+                  <span>↑ 26 this month</span>
+                </div>
+              </div>
+            </div>
           </div>
           
-          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Points</div>
-            <div className="text-3xl font-bold">{totalPoints}</div>
-          </div>
-          
-          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Streak</div>
-            <div className="text-3xl font-bold">{currentStreak}</div>
-          </div>
-          
-          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Rank</div>
-            <div className="text-3xl font-bold">#{rank}</div>
+          {/* Right column - Rank Graph */}
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg shadow-sm p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Rank Progress</div>
+              <ChartLine className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            </div>
+            <div className="h-[180px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={rankHistory}
+                  margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="rankGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis 
+                    dataKey="month" 
+                    tick={{ fontSize: 10 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis 
+                    reversed 
+                    domain={['dataMin', 'dataMax']} 
+                    hide={true}
+                  />
+                  <CartesianGrid 
+                    strokeDasharray="3 3" 
+                    vertical={false}
+                    stroke="#e5e7eb"
+                  />
+                  <Tooltip 
+                    formatter={(value) => [`#${value}`, 'Rank']}
+                    contentStyle={{
+                      backgroundColor: 'rgba(255,255,255,0.9)',
+                      borderRadius: '0.5rem',
+                      border: '1px solid #e5e7eb',
+                      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                      fontSize: '0.75rem',
+                    }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="rank" 
+                    stroke="#8b5cf6" 
+                    fillOpacity={1} 
+                    fill="url(#rankGradient)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="text-xs text-center text-gray-500 mt-1">
+              Lower rank number is better
+            </div>
           </div>
         </div>
       </CardContent>
