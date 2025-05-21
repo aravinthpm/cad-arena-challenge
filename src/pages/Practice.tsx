@@ -7,9 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose, DialogTrigger } from "@/components/ui/dialog";
-import { useState } from "react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 // Mock data for challenges
 const challenges: Challenge[] = [
@@ -106,12 +103,6 @@ const challenges: Challenge[] = [
 ];
 
 const Practice = () => {
-  const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
-
-  const handleChallengeSelect = (challenge: Challenge) => {
-    setSelectedChallenge(challenge);
-  };
-
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -211,49 +202,9 @@ const Practice = () => {
                         {challenge.points} points
                       </div>
                     </div>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button onClick={() => handleChallengeSelect(challenge)}>Preview</Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-3xl">
-                        <DialogHeader>
-                          <DialogTitle>{challenge.title}</DialogTitle>
-                          <DialogDescription>
-                            {challenge.level} Challenge • {challenge.points} points
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 my-4">
-                          <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
-                            <img 
-                              src={challenge.thumbnailUrl} 
-                              alt={challenge.title}
-                              className="w-full h-full object-cover" 
-                            />
-                          </div>
-                          <h3 className="font-semibold">Description</h3>
-                          <p className="text-gray-600 dark:text-gray-400">{challenge.description}</p>
-                          <h3 className="font-semibold">Instructions</h3>
-                          <p className="text-gray-600 dark:text-gray-400">{challenge.instructions}</p>
-                          <div className="flex items-center justify-between pt-4">
-                            <div>
-                              <p className="text-sm font-medium">Stats</p>
-                              <div className="flex gap-4 text-sm text-gray-500">
-                                <span>Submissions: {challenge.submissionCount}</span>
-                                <span>Success rate: {challenge.successRate}%</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <DialogFooter className="flex flex-col sm:flex-row gap-2">
-                          <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
-                          </DialogClose>
-                          <Link to={`/challenge/${challenge.id}`}>
-                            <Button>Start Challenge</Button>
-                          </Link>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                    <Link to={`/challenge/${challenge.id}`}>
+                      <Button>Start Challenge</Button>
+                    </Link>
                   </div>
                 </div>
               </div>
