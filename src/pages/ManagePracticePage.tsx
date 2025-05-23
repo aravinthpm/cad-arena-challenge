@@ -24,9 +24,10 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Wrench, Users, Eye, Edit, Trash2, Clock, Target, Calendar, User, Award } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const ManagePracticePage = () => {
-  const [practices] = useState([
+  const [practices, setPractices] = useState([
     {
       id: 1,
       title: "Mechanical Gear Design",
@@ -132,6 +133,22 @@ const ManagePracticePage = () => {
     setSelectedPractice(practice);
   };
 
+  const handleEditPractice = (practice) => {
+    toast({
+      title: "Edit Practice",
+      description: `Editing ${practice.title} - Feature coming soon!`,
+    });
+  };
+
+  const handleDeletePractice = (practiceId) => {
+    setPractices(practices.filter(p => p.id !== practiceId));
+    toast({
+      title: "Practice Deleted",
+      description: "The practice has been successfully deleted.",
+      variant: "destructive",
+    });
+  };
+
   const getParticipantsForPractice = (practiceId) => {
     return participantData.filter(p => p.practiceId === practiceId);
   };
@@ -200,20 +217,29 @@ const ManagePracticePage = () => {
                             <TableCell>{practice.points}</TableCell>
                             <TableCell>{practice.participants}</TableCell>
                             <TableCell>{practice.completions}</TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {practice.avgTime}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {practice.avgTime}
+                              </div>
                             </TableCell>
-                            <TableCell className="flex items-center gap-1">
-                              <Target className="h-3 w-3" />
-                              {practice.avgAccuracy}
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Target className="h-3 w-3" />
+                                {practice.avgAccuracy}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <Badge className={getStatusColor(practice.status)}>
                                 {practice.status}
                               </Badge>
                             </TableCell>
-                            <TableCell>{practice.createdAt}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {practice.createdAt}
+                              </div>
+                            </TableCell>
                             <TableCell className="text-right">
                               <div className="flex gap-2 justify-end">
                                 <Dialog>
@@ -222,6 +248,7 @@ const ManagePracticePage = () => {
                                       size="sm" 
                                       variant="outline"
                                       onClick={() => handleViewParticipants(practice)}
+                                      title="View participants"
                                     >
                                       <Eye className="h-4 w-4" />
                                     </Button>
@@ -286,25 +313,35 @@ const ManagePracticePage = () => {
                                         <TableBody>
                                           {getParticipantsForPractice(practice.id).map((participant) => (
                                             <TableRow key={participant.id}>
-                                              <TableCell className="flex items-center gap-2">
-                                                <User className="h-4 w-4" />
-                                                {participant.userName}
+                                              <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                  <User className="h-4 w-4" />
+                                                  {participant.userName}
+                                                </div>
                                               </TableCell>
-                                              <TableCell className="flex items-center gap-1">
-                                                <Calendar className="h-3 w-3" />
-                                                {participant.completedAt}
+                                              <TableCell>
+                                                <div className="flex items-center gap-1">
+                                                  <Calendar className="h-3 w-3" />
+                                                  {participant.completedAt}
+                                                </div>
                                               </TableCell>
-                                              <TableCell className="flex items-center gap-1">
-                                                <Clock className="h-3 w-3" />
-                                                {participant.timeSpent}
+                                              <TableCell>
+                                                <div className="flex items-center gap-1">
+                                                  <Clock className="h-3 w-3" />
+                                                  {participant.timeSpent}
+                                                </div>
                                               </TableCell>
-                                              <TableCell className="flex items-center gap-1">
-                                                <Target className="h-3 w-3" />
-                                                {participant.accuracy}
+                                              <TableCell>
+                                                <div className="flex items-center gap-1">
+                                                  <Target className="h-3 w-3" />
+                                                  {participant.accuracy}
+                                                </div>
                                               </TableCell>
-                                              <TableCell className="flex items-center gap-1">
-                                                <Award className="h-3 w-3" />
-                                                {participant.points}
+                                              <TableCell>
+                                                <div className="flex items-center gap-1">
+                                                  <Award className="h-3 w-3" />
+                                                  {participant.points}
+                                                </div>
                                               </TableCell>
                                               <TableCell>
                                                 <Badge className="bg-green-100 text-green-800">
@@ -318,10 +355,21 @@ const ManagePracticePage = () => {
                                     </div>
                                   </DialogContent>
                                 </Dialog>
-                                <Button size="sm" variant="outline">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleEditPractice(practice)}
+                                  title="Edit practice"
+                                >
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="text-red-600 hover:text-red-700"
+                                  onClick={() => handleDeletePractice(practice.id)}
+                                  title="Delete practice"
+                                >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
