@@ -18,6 +18,8 @@ import NotFound from "./pages/NotFound";
 import UserSearchPage from "./pages/UserSearchPage";
 import CreateChallengePage from "./pages/CreateChallengePage";
 import ManagePracticePage from "./pages/ManagePracticePage";
+import ContestManagementPage from "./pages/ContestManagementPage";
+import ContestJoinPage from "./pages/ContestJoinPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import LeaderboardPage from "./pages/Leaderboard";
 
@@ -49,6 +51,8 @@ const App = () => {
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/create-challenge" element={<CreateChallengePage />} />
             <Route path="/manage-practice" element={<ManagePracticePage />} />
+            <Route path="/contest-management" element={<ContestManagementPage />} />
+            <Route path="/contest/join/:challengeId" element={<ContestJoinPage />} />
             <Route path="/profile/:id" element={<UserProfilePage />} />
             <Route path="/profile/:id/followers" element={<UserProfilePage />} />
             <Route path="/profile/:id/following" element={<UserProfilePage />} />
