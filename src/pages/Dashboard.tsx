@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Code, Trophy, Building, User as UserIcon, Users } from "lucide-react";
+import { Code, Trophy, Building, User as UserIcon, Users, Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 import Navbar from "@/components/Navbar";
@@ -149,6 +149,12 @@ const OrganizationDashboard = () => {
               <div className="flex flex-col space-y-2">
                 <Button asChild>
                   <Link to="/create-challenge">Create New Challenge</Link>
+                </Button>
+                <Button asChild className="bg-green-600 hover:bg-green-700">
+                  <Link to="/manage-practice">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create New Practice
+                  </Link>
                 </Button>
                 <Button variant="outline" asChild>
                   <Link to="/manage-practice">Manage Practice Sessions</Link>

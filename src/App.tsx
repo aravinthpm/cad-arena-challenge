@@ -48,6 +48,7 @@ const App = () => {
             <Route path="/search" element={<UserSearchPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/create-challenge" element={<CreateChallengePage />} />
+            <Route path="/manage-practice" element={<ManagePracticePage />} />
             <Route path="/profile/:id" element={<UserProfilePage />} />
             <Route path="/profile/:id/followers" element={<UserProfilePage />} />
             <Route path="/profile/:id/following" element={<UserProfilePage />} />

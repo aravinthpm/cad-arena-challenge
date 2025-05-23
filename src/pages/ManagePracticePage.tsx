@@ -14,8 +14,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Wrench, Users, Eye, Edit, Trash2 } from "lucide-react";
+import { Wrench, Users, Eye, Edit, Trash2, Clock, Target, Calendar, User, Award } from "lucide-react";
 
 const ManagePracticePage = () => {
   const [practices] = useState([
@@ -26,7 +34,10 @@ const ManagePracticePage = () => {
       points: 250,
       participants: 45,
       status: "Active",
-      createdAt: "2024-01-15"
+      createdAt: "2024-01-15",
+      completions: 23,
+      avgTime: "45 min",
+      avgAccuracy: "78%"
     },
     {
       id: 2,
@@ -35,7 +46,10 @@ const ManagePracticePage = () => {
       points: 400,
       participants: 23,
       status: "Active",
-      createdAt: "2024-01-10"
+      createdAt: "2024-01-10",
+      completions: 15,
+      avgTime: "67 min",
+      avgAccuracy: "65%"
     },
     {
       id: 3,
@@ -44,9 +58,47 @@ const ManagePracticePage = () => {
       points: 150,
       participants: 67,
       status: "Draft",
-      createdAt: "2024-01-08"
+      createdAt: "2024-01-08",
+      completions: 45,
+      avgTime: "28 min",
+      avgAccuracy: "85%"
     }
   ]);
+
+  const [participantData] = useState([
+    {
+      id: 1,
+      practiceId: 1,
+      userName: "John Smith",
+      completedAt: "2024-01-20 14:30",
+      timeSpent: "42 min",
+      accuracy: "82%",
+      points: 205,
+      status: "Completed"
+    },
+    {
+      id: 2,
+      practiceId: 1,
+      userName: "Sarah Johnson",
+      completedAt: "2024-01-19 16:15",
+      timeSpent: "38 min",
+      accuracy: "89%",
+      points: 223,
+      status: "Completed"
+    },
+    {
+      id: 3,
+      practiceId: 1,
+      userName: "Mike Chen",
+      completedAt: "2024-01-18 10:45",
+      timeSpent: "51 min",
+      accuracy: "75%",
+      points: 188,
+      status: "Completed"
+    }
+  ]);
+
+  const [selectedPractice, setSelectedPractice] = useState(null);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
@@ -74,6 +126,14 @@ const ManagePracticePage = () => {
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const handleViewParticipants = (practice) => {
+    setSelectedPractice(practice);
+  };
+
+  const getParticipantsForPractice = (practiceId) => {
+    return participantData.filter(p => p.practiceId === practiceId);
   };
 
   return (
@@ -118,6 +178,9 @@ const ManagePracticePage = () => {
                           <TableHead>Difficulty</TableHead>
                           <TableHead>Points</TableHead>
                           <TableHead>Participants</TableHead>
+                          <TableHead>Completions</TableHead>
+                          <TableHead>Avg Time</TableHead>
+                          <TableHead>Avg Accuracy</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Created</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
@@ -136,6 +199,15 @@ const ManagePracticePage = () => {
                             </TableCell>
                             <TableCell>{practice.points}</TableCell>
                             <TableCell>{practice.participants}</TableCell>
+                            <TableCell>{practice.completions}</TableCell>
+                            <TableCell className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {practice.avgTime}
+                            </TableCell>
+                            <TableCell className="flex items-center gap-1">
+                              <Target className="h-3 w-3" />
+                              {practice.avgAccuracy}
+                            </TableCell>
                             <TableCell>
                               <Badge className={getStatusColor(practice.status)}>
                                 {practice.status}
@@ -144,13 +216,112 @@ const ManagePracticePage = () => {
                             <TableCell>{practice.createdAt}</TableCell>
                             <TableCell className="text-right">
                               <div className="flex gap-2 justify-end">
-                                <Button size="sm" variant="outline">
-                                  <Eye className="h-4 w-4" />
-                                </Button>
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      onClick={() => handleViewParticipants(practice)}
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-4xl">
+                                    <DialogHeader>
+                                      <DialogTitle>Practice Participants - {practice.title}</DialogTitle>
+                                      <DialogDescription>
+                                        View all participants and their performance for this practice
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="mt-4">
+                                      <div className="grid grid-cols-3 gap-4 mb-6">
+                                        <Card>
+                                          <CardContent className="pt-6">
+                                            <div className="flex items-center space-x-2">
+                                              <Users className="h-4 w-4 text-blue-600" />
+                                              <div>
+                                                <p className="text-sm font-medium">Total Participants</p>
+                                                <p className="text-2xl font-bold">{practice.participants}</p>
+                                              </div>
+                                            </div>
+                                          </CardContent>
+                                        </Card>
+                                        <Card>
+                                          <CardContent className="pt-6">
+                                            <div className="flex items-center space-x-2">
+                                              <Award className="h-4 w-4 text-green-600" />
+                                              <div>
+                                                <p className="text-sm font-medium">Completion Rate</p>
+                                                <p className="text-2xl font-bold">
+                                                  {Math.round((practice.completions / practice.participants) * 100)}%
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </CardContent>
+                                        </Card>
+                                        <Card>
+                                          <CardContent className="pt-6">
+                                            <div className="flex items-center space-x-2">
+                                              <Target className="h-4 w-4 text-orange-600" />
+                                              <div>
+                                                <p className="text-sm font-medium">Avg Accuracy</p>
+                                                <p className="text-2xl font-bold">{practice.avgAccuracy}</p>
+                                              </div>
+                                            </div>
+                                          </CardContent>
+                                        </Card>
+                                      </div>
+                                      
+                                      <Table>
+                                        <TableHeader>
+                                          <TableRow>
+                                            <TableHead>Participant</TableHead>
+                                            <TableHead>Completed At</TableHead>
+                                            <TableHead>Time Spent</TableHead>
+                                            <TableHead>Accuracy</TableHead>
+                                            <TableHead>Points Earned</TableHead>
+                                            <TableHead>Status</TableHead>
+                                          </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                          {getParticipantsForPractice(practice.id).map((participant) => (
+                                            <TableRow key={participant.id}>
+                                              <TableCell className="flex items-center gap-2">
+                                                <User className="h-4 w-4" />
+                                                {participant.userName}
+                                              </TableCell>
+                                              <TableCell className="flex items-center gap-1">
+                                                <Calendar className="h-3 w-3" />
+                                                {participant.completedAt}
+                                              </TableCell>
+                                              <TableCell className="flex items-center gap-1">
+                                                <Clock className="h-3 w-3" />
+                                                {participant.timeSpent}
+                                              </TableCell>
+                                              <TableCell className="flex items-center gap-1">
+                                                <Target className="h-3 w-3" />
+                                                {participant.accuracy}
+                                              </TableCell>
+                                              <TableCell className="flex items-center gap-1">
+                                                <Award className="h-3 w-3" />
+                                                {participant.points}
+                                              </TableCell>
+                                              <TableCell>
+                                                <Badge className="bg-green-100 text-green-800">
+                                                  {participant.status}
+                                                </Badge>
+                                              </TableCell>
+                                            </TableRow>
+                                          ))}
+                                        </TableBody>
+                                      </Table>
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
                                 <Button size="sm" variant="outline">
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button size="sm" variant="outline">
+                                <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
