@@ -17,6 +17,7 @@ import Documentation from "./pages/Documentation";
 import NotFound from "./pages/NotFound";
 import UserSearchPage from "./pages/UserSearchPage";
 import CreateChallengePage from "./pages/CreateChallengePage";
+import ManagePracticePage from "./pages/ManagePracticePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import LeaderboardPage from "./pages/Leaderboard";
 

@@ -118,10 +118,14 @@ const OrganizationDashboard = () => {
               <CardTitle>Organization Stats</CardTitle>
             </CardHeader>
             <CardContent>
-              <dl className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
+              <dl className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                   <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Challenges Created</dt>
                   <dd className="text-3xl font-bold">8</dd>
+                </div>
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Practice Sessions</dt>
+                  <dd className="text-3xl font-bold">12</dd>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                   <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Total Participants</dt>
@@ -145,6 +149,9 @@ const OrganizationDashboard = () => {
               <div className="flex flex-col space-y-2">
                 <Button asChild>
                   <Link to="/create-challenge">Create New Challenge</Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link to="/manage-practice">Manage Practice Sessions</Link>
                 </Button>
                 <Button variant="outline" asChild>
                   <Link to="/competitions/manage">Manage Competitions</Link>
