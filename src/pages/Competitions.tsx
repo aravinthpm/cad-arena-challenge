@@ -26,11 +26,11 @@ const contests: Contest[] = [
     organizationId: "org1",
     startDate: new Date("2023-06-15"),
     endDate: new Date("2023-06-30"),
-    challenges: [],
+    challengeIds: ["101", "102"],
     registeredUsers: 156,
     status: "active",
     prizes: ["$2000 Cash Prize", "Internship Opportunity", "Industry Recognition"],
-    isPublic: true,
+    visibility: ChallengeVisibility.PUBLIC,
     registrationType: "open"
   },
   {
@@ -40,11 +40,11 @@ const contests: Contest[] = [
     organizationId: "org2",
     startDate: new Date("2023-07-01"),
     endDate: new Date("2023-07-15"),
-    challenges: [],
+    challengeIds: ["201", "202"],
     registeredUsers: 89,
     status: "upcoming",
     prizes: ["$1500 Cash Prize", "Feature in Design Magazine", "Mentorship Program"],
-    isPublic: true,
+    visibility: ChallengeVisibility.PUBLIC,
     registrationType: "open"
   },
   {
@@ -54,11 +54,11 @@ const contests: Contest[] = [
     organizationId: "org3",
     startDate: new Date("2023-05-10"),
     endDate: new Date("2023-05-30"),
-    challenges: [],
+    challengeIds: ["301", "302", "303"],
     registeredUsers: 212,
     status: "completed",
     prizes: ["$3000 Cash Prize", "Product Development Support", "Industry Connections"],
-    isPublic: true,
+    visibility: ChallengeVisibility.PUBLIC,
     registrationType: "approval"
   },
   {
@@ -68,11 +68,11 @@ const contests: Contest[] = [
     organizationId: "org2",
     startDate: new Date("2023-08-01"),
     endDate: new Date("2023-08-20"),
-    challenges: [],
+    challengeIds: ["401"],
     registeredUsers: 78,
     status: "upcoming",
     prizes: ["$1000 Cash Prize", "Production Opportunity", "Design Showcase"],
-    isPublic: false,
+    visibility: ChallengeVisibility.PRIVATE,
     registrationType: "invitation"
   },
   {
@@ -82,11 +82,11 @@ const contests: Contest[] = [
     organizationId: "org1",
     startDate: new Date("2023-07-10"),
     endDate: new Date("2023-08-10"),
-    challenges: [],
+    challengeIds: ["501", "502"],
     registeredUsers: 132,
     status: "upcoming",
     prizes: ["$5000 Cash Prize", "Industry Internship", "Conference Presentation"],
-    isPublic: true,
+    visibility: ChallengeVisibility.PUBLIC,
     registrationType: "open"
   },
   {
@@ -96,11 +96,11 @@ const contests: Contest[] = [
     organizationId: "org3",
     startDate: new Date("2023-04-15"),
     endDate: new Date("2023-05-15"),
-    challenges: [],
+    challengeIds: ["601", "602"],
     registeredUsers: 175,
     status: "completed",
     prizes: ["$2500 Cash Prize", "Product Prototype Development", "Investor Pitch Opportunity"],
-    isPublic: true,
+    visibility: ChallengeVisibility.PUBLIC,
     registrationType: "approval"
   }
 ];
