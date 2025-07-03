@@ -1,11 +1,15 @@
+
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import ChallengeCard from "@/components/ChallengeCard";
-import { Challenge, ChallengeLevel, ChallengeStatus, ChallengeType, ChallengeVisibility } from "@/utils/types";
+import { Challenge, ChallengeLevel, ChallengeStatus } from "@/utils/types";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose, DialogTrigger } from "@/components/ui/dialog";
+import { useState } from "react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 // Mock data for challenges
 const challenges: Challenge[] = [
@@ -15,16 +19,12 @@ const challenges: Challenge[] = [
     description: "Create a simple spur gear with specific tooth profile and dimensions.",
     instructions: "Design a spur gear with 24 teeth, module 2mm, and pressure angle of 20°.",
     level: ChallengeLevel.BEGINNER,
-    type: ChallengeType.RACE_AGAINST_TIME,
-    visibility: ChallengeVisibility.PUBLIC,
     points: 100,
     thumbnailUrl: "/placeholder.svg",
     status: ChallengeStatus.PUBLISHED,
     creatorId: "org1",
     createdAt: new Date("2023-01-15"),
     updatedAt: new Date("2023-01-15"),
-    startDate: new Date("2023-01-15"),
-    endDate: new Date("2023-12-31"),
     submissionCount: 876,
     successRate: 87,
   },
@@ -34,16 +34,12 @@ const challenges: Challenge[] = [
     description: "Design an ergonomic handle for a kitchen utensil that fits comfortably in the hand.",
     instructions: "Create a handle that fits the human grip with appropriate curves and dimensions.",
     level: ChallengeLevel.INTERMEDIATE,
-    type: ChallengeType.CREATIVE,
-    visibility: ChallengeVisibility.PUBLIC,
     points: 200,
     thumbnailUrl: "/placeholder.svg",
     status: ChallengeStatus.PUBLISHED,
     creatorId: "org2",
     createdAt: new Date("2023-02-20"),
     updatedAt: new Date("2023-02-22"),
-    startDate: new Date("2023-02-20"),
-    endDate: new Date("2023-12-31"),
     submissionCount: 542,
     successRate: 65,
   },
@@ -53,16 +49,12 @@ const challenges: Challenge[] = [
     description: "Create a fully parameterized corner bracket that can adapt to different load requirements.",
     instructions: "Design a bracket that can be adjusted through parameters for different applications.",
     level: ChallengeLevel.ADVANCED,
-    type: ChallengeType.RACE_AGAINST_TIME,
-    visibility: ChallengeVisibility.PUBLIC,
     points: 300,
     thumbnailUrl: "/placeholder.svg",
     status: ChallengeStatus.PUBLISHED,
     creatorId: "org1",
     createdAt: new Date("2023-03-10"),
     updatedAt: new Date("2023-03-15"),
-    startDate: new Date("2023-03-10"),
-    endDate: new Date("2023-12-31"),
     submissionCount: 315,
     successRate: 42,
   },
@@ -72,16 +64,12 @@ const challenges: Challenge[] = [
     description: "Create a compact and foldable phone stand that can be 3D printed.",
     instructions: "Design a phone stand that can be folded flat and 3D printed without supports.",
     level: ChallengeLevel.BEGINNER,
-    type: ChallengeType.CREATIVE,
-    visibility: ChallengeVisibility.PUBLIC,
     points: 100,
     thumbnailUrl: "/placeholder.svg",
     status: ChallengeStatus.PUBLISHED,
     creatorId: "org2",
     createdAt: new Date("2023-03-05"),
     updatedAt: new Date("2023-03-05"),
-    startDate: new Date("2023-03-05"),
-    endDate: new Date("2023-12-31"),
     submissionCount: 723,
     successRate: 91,
   },
@@ -91,16 +79,12 @@ const challenges: Challenge[] = [
     description: "Design an adjustable desk lamp with multiple pivot points.",
     instructions: "Create a desk lamp with at least 3 adjustable joints and stable base.",
     level: ChallengeLevel.INTERMEDIATE,
-    type: ChallengeType.RACE_AGAINST_TIME,
-    visibility: ChallengeVisibility.PUBLIC,
     points: 200,
     thumbnailUrl: "/placeholder.svg",
     status: ChallengeStatus.PUBLISHED,
     creatorId: "org1",
     createdAt: new Date("2023-04-01"),
     updatedAt: new Date("2023-04-03"),
-    startDate: new Date("2023-04-01"),
-    endDate: new Date("2023-12-31"),
     submissionCount: 412,
     successRate: 63,
   },
@@ -110,22 +94,24 @@ const challenges: Challenge[] = [
     description: "Design a lightweight but durable frame for a quadcopter drone.",
     instructions: "Create a drone frame that balances weight, strength, and ease of assembly.",
     level: ChallengeLevel.ADVANCED,
-    type: ChallengeType.CREATIVE,
-    visibility: ChallengeVisibility.PUBLIC,
     points: 250,
     thumbnailUrl: "/placeholder.svg",
     status: ChallengeStatus.PUBLISHED,
     creatorId: "org3",
     createdAt: new Date("2023-04-12"),
     updatedAt: new Date("2023-04-15"),
-    startDate: new Date("2023-04-12"),
-    endDate: new Date("2023-12-31"),
     submissionCount: 278,
     successRate: 51,
   },
 ];
 
 const Practice = () => {
+  const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
+
+  const handleChallengeSelect = (challenge: Challenge) => {
+    setSelectedChallenge(challenge);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -225,9 +211,49 @@ const Practice = () => {
                         {challenge.points} points
                       </div>
                     </div>
-                    <Link to={`/challenge/${challenge.id}`}>
-                      <Button>Start Challenge</Button>
-                    </Link>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button onClick={() => handleChallengeSelect(challenge)}>Preview</Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-3xl">
+                        <DialogHeader>
+                          <DialogTitle>{challenge.title}</DialogTitle>
+                          <DialogDescription>
+                            {challenge.level} Challenge • {challenge.points} points
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 my-4">
+                          <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
+                            <img 
+                              src={challenge.thumbnailUrl} 
+                              alt={challenge.title}
+                              className="w-full h-full object-cover" 
+                            />
+                          </div>
+                          <h3 className="font-semibold">Description</h3>
+                          <p className="text-gray-600 dark:text-gray-400">{challenge.description}</p>
+                          <h3 className="font-semibold">Instructions</h3>
+                          <p className="text-gray-600 dark:text-gray-400">{challenge.instructions}</p>
+                          <div className="flex items-center justify-between pt-4">
+                            <div>
+                              <p className="text-sm font-medium">Stats</p>
+                              <div className="flex gap-4 text-sm text-gray-500">
+                                <span>Submissions: {challenge.submissionCount}</span>
+                                <span>Success rate: {challenge.successRate}%</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+                          <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                          </DialogClose>
+                          <Link to={`/challenge/${challenge.id}`}>
+                            <Button>Start Challenge</Button>
+                          </Link>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
               </div>

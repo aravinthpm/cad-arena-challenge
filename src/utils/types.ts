@@ -55,40 +55,23 @@ export enum ChallengeStatus {
   ARCHIVED = "archived"
 }
 
-export enum ChallengeType {
-  RACE_AGAINST_TIME = "race-against-time",
-  CREATIVE = "creative"
-}
-
-export enum ChallengeVisibility {
-  PUBLIC = "public",
-  PRIVATE = "private"
-}
-
 export interface Challenge {
   id: string;
   title: string;
   description: string;
   instructions: string;
   level: ChallengeLevel;
-  type: ChallengeType;
-  visibility: ChallengeVisibility;
   points: number;
   thumbnailUrl: string;
   status: ChallengeStatus;
   creatorId: string;
   createdAt: Date;
   updatedAt: Date;
-  startDate: Date;
-  endDate: Date;
-  maxParticipants?: number;
   submissionCount: number;
   successRate: number;
   averageCompletionTime?: number;
   referenceMaterials?: ReferenceMaterial[];
   quizQuestions?: QuizQuestion[];
-  inviteToken?: string;
-  contestName?: string;
 }
 
 export interface ReferenceMaterial {
@@ -111,41 +94,27 @@ export interface Contest {
   title: string;
   description: string;
   organizationId: string;
-  challengeIds: string[];
   startDate: Date;
   endDate: Date;
+  challenges: Challenge[];
   registeredUsers: number;
-  status: "upcoming" | "active" | "completed" | "draft";
+  status: "upcoming" | "active" | "completed";
   prizes?: string[];
-  visibility: ChallengeVisibility;
+  isPublic: boolean;
   registrationType: "open" | "invitation" | "approval";
-  inviteToken?: string;
-  maxParticipants?: number;
-}
-
-export interface ContestParticipant {
-  id: string;
-  contestId: string;
-  userId: string;
-  registeredAt: Date;
-  inviteToken?: string;
-  status: "registered" | "active" | "completed" | "disqualified";
 }
 
 export interface Submission {
   id: string;
   userId: string;
   challengeId: string;
-  contestId?: string;
   submittedAt: Date;
-  status: "correct" | "incorrect" | "pending" | "reviewing";
+  status: "correct" | "incorrect" | "pending";
   fileUrl: string;
   score?: number;
   completionTime: number;
   quizAnswers?: Record<string, number>;
   feedback?: string;
-  reviewedBy?: string;
-  reviewedAt?: Date;
 }
 
 export interface Certificate {
@@ -159,19 +128,9 @@ export interface Certificate {
   contestTitle: string;
 }
 
+// New types for follow system
 export interface UserFollowRelation {
   followerId: string;
   followingId: string;
   createdAt: Date;
-}
-
-export interface ContestInviteLink {
-  id: string;
-  contestId: string;
-  token: string;
-  createdAt: Date;
-  expiresAt?: Date;
-  usageCount: number;
-  maxUsage?: number;
-  isActive: boolean;
 }

@@ -8,7 +8,6 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
-import ProfileEdit from "./pages/ProfileEdit";
 import Practice from "./pages/Practice";
 import ChallengeView from "./pages/ChallengeView";
 import Competitions from "./pages/Competitions";
@@ -17,9 +16,6 @@ import Documentation from "./pages/Documentation";
 import NotFound from "./pages/NotFound";
 import UserSearchPage from "./pages/UserSearchPage";
 import CreateChallengePage from "./pages/CreateChallengePage";
-import ManagePracticePage from "./pages/ManagePracticePage";
-import ContestManagementPage from "./pages/ContestManagementPage";
-import ContestJoinPage from "./pages/ContestJoinPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import LeaderboardPage from "./pages/Leaderboard";
 
@@ -41,7 +37,6 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/profile/edit" element={<ProfileEdit />} />
             <Route path="/practice" element={<Practice />} />
             <Route path="/challenge/:id" element={<ChallengeView />} />
             <Route path="/competitions" element={<Competitions />} />
@@ -50,9 +45,6 @@ const App = () => {
             <Route path="/search" element={<UserSearchPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/create-challenge" element={<CreateChallengePage />} />
-            <Route path="/manage-practice" element={<ManagePracticePage />} />
-            <Route path="/contest-management" element={<ContestManagementPage />} />
-            <Route path="/contest/join/:challengeId" element={<ContestJoinPage />} />
             <Route path="/profile/:id" element={<UserProfilePage />} />
             <Route path="/profile/:id/followers" element={<UserProfilePage />} />
             <Route path="/profile/:id/following" element={<UserProfilePage />} />
